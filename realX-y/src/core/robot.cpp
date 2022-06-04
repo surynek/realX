@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-053_nofutu                             */
+/*                             realX 0-054_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* robot.cpp / 0-053_nofutu                                                   */
+/* robot.cpp / 0-054_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.

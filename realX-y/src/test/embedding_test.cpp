@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-053_nofutu                             */
+/*                             realX 0-054_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* embedding_test.cpp / 0-053_nofutu                                          */
+/* embedding_test.cpp / 0-054_nofutu                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding test.
