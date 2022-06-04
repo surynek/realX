@@ -11,6 +11,11 @@ An experimental package for problem solving in robotics.
 
 -------------------------------------------------------
 
+This project was intended as a collection of motion
+planning programs for robotics but as many times before
+contains completely unrelated programs such as network
+embedding based on SAT.
+
 
 
 -------------------------------------------------------
