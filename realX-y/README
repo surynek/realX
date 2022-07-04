@@ -1,0 +1,32 @@
+-------------------------------------------------------
+
+realX
+
+(C) Pavel Surynek, 2021 - 2022
+pavel@surynek.net
+
+=======================================================
+
+An experimental package for problem solving in robotics.
+
+-------------------------------------------------------
+
+This project was intended as a collection of motion
+planning programs for robotics but as many times before
+contains completely unrelated programs such as network
+embedding based on SAT.
+
+
+
+-------------------------------------------------------
+
+Trivia:
+I had no idea how to call this project. realX is just
+some nearly random name.
+
+-------------------------------------------------------
+
+Please enjoy your robotic problem solving...
+Pavel Surynek, 04/2021
+
+-------------------- **** -----------------------------
