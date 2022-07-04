@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-055_nofutu                             */
+/*                             realX 0-057_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-055_nofutu                                                 */
+/* network.cpp / 0-057_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -353,7 +353,7 @@ namespace realX
     }
 
     
-    void sPathEmbeddingModel::setup_LazyPathModel(sBoolEncoder *encoder)
+    void sPathEmbeddingModel::setup_LazyPathModel(sBoolEncoder *encoder, sDouble geographical_distance)
     {
 	sInt_32 offset = 1;
 	
@@ -378,11 +378,13 @@ namespace realX
 	    }
 	}
 	m_last_edge_mapping_variable = offset;
-	encoder->set_LastVariableID(offset);	
+	encoder->set_LastVariableID(offset);
+
+	m_geographical_distance = geographical_distance;
     }
 
 
-    void sPathEmbeddingModel::setup_LimitedLazyPathModel(sBoolEncoder *encoder, sInt_32 depth)
+    void sPathEmbeddingModel::setup_LimitedLazyPathModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance)
     {
 	sInt_32 offset = 1;
 	
@@ -408,12 +410,13 @@ namespace realX
 	}
 	m_last_edge_mapping_variable = offset;
 	encoder->set_LastVariableID(offset);
+
+	m_geographical_distance = geographical_distance;	
     }    
 
     
     void sPathEmbeddingModel::build_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver)
     {
-	printf("Phase 1\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
@@ -447,7 +450,6 @@ namespace realX
 		}
 	    }
 	}
-	printf("Phase 2\n");
 	
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
@@ -464,7 +466,6 @@ namespace realX
 	    }
 	}
 
-	printf("Phase 3\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
@@ -479,7 +480,6 @@ namespace realX
 		encoder->cast_Disjunction(solver, mapping_IDs);
 	    }
 	}
-	printf("Phase 4\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
@@ -518,13 +518,17 @@ namespace realX
 		}
 	    }
 	}
-	*/	
+	*/
+
+	if (m_geographical_distance >= 0.0)
+	{
+	    build_GeographicalConstraints(encoder, solver);
+	}
     }
 
 
     void sPathEmbeddingModel::build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth)
     {
-	printf("Phase 1\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
@@ -560,7 +564,6 @@ namespace realX
 	}
 	clock_t time_begin, time_finish;
 	time_begin = clock();
-	printf("Phase 2\n");
 	
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
@@ -579,7 +582,6 @@ namespace realX
 	time_finish = clock();
 	printf("Intermediate time: %.3f\n", (time_finish - time_begin) / (sDouble)CLOCKS_PER_SEC);
 
-	printf("Phase 3\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
@@ -594,7 +596,6 @@ namespace realX
 		encoder->cast_Disjunction(solver, mapping_IDs);
 	    }
 	}
-	printf("Phase 4\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
@@ -633,7 +634,11 @@ namespace realX
 		}
 	    }
 	}
-	*/	
+	*/
+	if (m_geographical_distance >= 0.0)
+	{
+	    build_GeographicalConstraints(encoder, solver);
+	}	
     }    
 
 
@@ -850,6 +855,37 @@ namespace realX
 	encoder->cast_MultiImplication(solver, virt_v_to_phys_id, target_v_IDs);
     }
 
+
+    void sPathEmbeddingModel::build_GeographicalConstraints(sBoolEncoder *encoder, Glucose::Solver *solver)
+    {
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
+	    {
+		for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
+		{
+		    sDouble x1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_x;
+		    sDouble y1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_y;
+
+
+		    sDouble x2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_x;
+		    sDouble y2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_y;
+
+		    sDouble dx = x2 - x1;
+		    sDouble dy = y2 - y1;
+
+		    sDouble distance = sqrt(dx * dx + dy * dy);
+
+		    if (distance > m_geographical_distance)
+		    {
+			sInt_32 vertex_u_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);
+			encoder->cast_BitUnset(solver, vertex_u_mapping_ID);
+		    }
+		}
+	    }
+	}
+    }
+		
 
     bool sPathEmbeddingModel::solve_LazyPathModel(Glucose::Solver *solver)
     {
@@ -1482,6 +1518,48 @@ namespace realX
 	fprintf(fw, "%s%s}\n", indent.c_str(), s_INDENT.c_str());
 	fprintf(fw, "%s}\n", indent.c_str());	
     }
+
+
+    void sPathEmbeddingModel::to_Screen_embedding(const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, const sString &indent) const
+    {	
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    printf("%sVirtual network: %d\n", indent.c_str(), vn_id);
+
+	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
+	    {
+		printf("%s%s%d --> %d\n", indent.c_str(), s_INDENT.c_str(), virt_u_id, vertex_Embeddings[vn_id][virt_u_id]);
+	    }
+
+	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
+	    {
+		sInt_32 neighbor_index = 0;
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_u_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_u_id].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    sInt_32 neighbor_id = (*virt_neighbor)->m_target->m_id;
+		    printf("%s%s%d (%d)-- %d (%d):\n", indent.c_str(), s_INDENT.c_str(), virt_u_id, vertex_Embeddings[vn_id][virt_u_id], neighbor_id, vertex_Embeddings[vn_id][neighbor_id]);
+
+		    printf("%s%s%s", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str());
+		    for (sInt_32 path_index = 0; path_index < path_Embeddings[vn_id][virt_u_id][neighbor_index].size(); ++path_index)
+		    {
+			sInt_32 phys_u_id = path_Embeddings[vn_id][virt_u_id][neighbor_index][path_index];
+
+			if (phys_u_id >= 0)
+			{
+			    printf("%d ", phys_u_id);
+			}
+			else
+			{
+			    break;
+			}
+		    }
+		    printf("\n");
+		    ++neighbor_index;
+		}
+	    }
+	}	
+    }
+    
     
 
     

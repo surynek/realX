@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-055_nofutu                             */
+/*                             realX 0-057_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-055_nofutu                                                   */
+/* network.h / 0-057_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -99,15 +99,17 @@ namespace realX
 
     public:
 	Glucose::Solver* setup_SATSolver(sDouble timeout = -1.0);	
-	void setup_LazyPathModel(sBoolEncoder *encoder);
-	void setup_LimitedLazyPathModel(sBoolEncoder *encoder, sInt_32 depth);	
+	void setup_LazyPathModel(sBoolEncoder *encoder, sDouble geographical_distance = -1);
+	void setup_LimitedLazyPathModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance = -1);	
 	
 	void build_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver);
-	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth);	
+	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth);
+	
 	void build_IndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
 	void build_LimitedIndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 depth);
 	
-	void build_IndividualCorrespondence(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id);	
+	void build_IndividualCorrespondence(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id);
+	void build_GeographicalConstraints(sBoolEncoder *encoder, Glucose::Solver *solver);
 	
         bool solve_LazyPathModel(Glucose::Solver *solver);
 	
@@ -128,6 +130,8 @@ namespace realX
 	virtual void to_Screen(const sString &indent = "") const;
 	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
 
+	virtual void to_Screen_embedding(const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, const sString &indent = "") const;
+
     public:		
 	s_DirectedGraph m_physical_Network;
 	DirectedGraphs_vector m_virtual_Networks;
@@ -135,7 +139,9 @@ namespace realX
 	VertexOffsets_vector m_vertex_mapping_Offsets;
 	sInt_32 m_last_vertex_mapping_variable;
 	sInt_32 m_last_edge_mapping_variable;	
-	EdgeOffsets_vector m_edge_mapping_Offsets;	
+	EdgeOffsets_vector m_edge_mapping_Offsets;
+
+	sDouble m_geographical_distance;
     };    
   
 
