@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-062_nofutu                             */
-=======
-/*                             realX 0-057_nofutu                             */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/*                             realX 0-061_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* config.h / 0-062_nofutu                                                    */
-=======
-/* config.h / 0-057_nofutu                                                    */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/* config.h / 0-061_nofutu                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Configuration file for auRIx package - global settings.

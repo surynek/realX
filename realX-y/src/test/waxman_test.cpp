@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-062_nofutu                             */
-=======
-/*                             realX 0-057_nofutu                             */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/*                             realX 0-061_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* waxman_test.cpp / 0-062_nofutu                                             */
-=======
-/* waxman_test.cpp / 0-057_nofutu                                             */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/* waxman_test.cpp / 0-061_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -421,7 +413,6 @@ sResult waxman_test_4(void)
 }
 
 
-<<<<<<< HEAD
 sResult waxman_test_5(void)
 {
     clock_t time_start, time_finish;
@@ -548,8 +539,6 @@ sResult waxman_test_6(void)
 }
 
 
-=======
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
 }  // namespace realX
 
 
@@ -581,7 +570,6 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
-<<<<<<< HEAD
 /*
     if (sFAILED(result = waxman_test_4()))
     {
@@ -603,13 +591,6 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	printf("Test waxman 6 failed (error:%d).\n", result);
 	return result;
     }        
-=======
-    if (sFAILED(result = waxman_test_4()))
-    {
-	printf("Test waxman 4 failed (error:%d).\n", result);
-	return result;
-    }                 
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
    
     return sRESULT_SUCCESS;
 }

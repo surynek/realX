@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-062_nofutu                             */
-=======
-/*                             realX 0-057_nofutu                             */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/*                             realX 0-061_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* network.cpp / 0-062_nofutu                                                 */
-=======
-/* network.cpp / 0-057_nofutu                                                 */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/* network.cpp / 0-061_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -1642,11 +1634,7 @@ namespace realX
 		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_u_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_u_id].m_out_Neighbors.end(); ++virt_neighbor)
 		{
 		    sInt_32 neighbor_id = (*virt_neighbor)->m_target->m_id;
-<<<<<<< HEAD
 		    printf("%s%s%d (%d) -- %d (%d):\n", indent.c_str(), s_INDENT.c_str(), virt_u_id, vertex_Embeddings[vn_id][virt_u_id], neighbor_id, vertex_Embeddings[vn_id][neighbor_id]);
-=======
-		    printf("%s%s%d (%d)-- %d (%d):\n", indent.c_str(), s_INDENT.c_str(), virt_u_id, vertex_Embeddings[vn_id][virt_u_id], neighbor_id, vertex_Embeddings[vn_id][neighbor_id]);
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
 
 		    printf("%s%s%s", indent.c_str(), s_INDENT.c_str(), s_INDENT.c_str());
 		    for (sInt_32 path_index = 0; path_index < path_Embeddings[vn_id][virt_u_id][neighbor_index].size(); ++path_index)

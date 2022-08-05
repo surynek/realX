@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-062_nofutu                             */
-=======
-/*                             realX 0-057_nofutu                             */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/*                             realX 0-061_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* version.h / 0-062_nofutu                                                   */
-=======
-/* version.h / 0-057_nofutu                                                   */
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+/* version.h / 0-061_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Version file for realX
@@ -35,13 +27,8 @@ using namespace realX;
 namespace realX
 {
 
-<<<<<<< HEAD
-#define sVERSION "0-062_nofutu"
-#define sPRODUCT "realX 0-062_nofutu"
-=======
-#define sVERSION "0-057_nofutu"
-#define sPRODUCT "realX 0-057_nofutu"
->>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
+#define sVERSION "0-061_nofutu"
+#define sPRODUCT "realX 0-061_nofutu"
 #define sAUTHOR "Pavel Surynek"
 #define sAUTHOR_LONG "Pavel Surynek <pavel@surynek.net>"
 #define sCOPYRIGHT "(C) Copyright 2021 - 2022 Pavel Surynek"
