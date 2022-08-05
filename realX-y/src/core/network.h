@@ -1,7 +1,11 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
+<<<<<<< HEAD
 /*                             realX 0-062_nofutu                             */
+=======
+/*                             realX 0-057_nofutu                             */
+>>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +13,11 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
+<<<<<<< HEAD
 /* network.h / 0-062_nofutu                                                   */
+=======
+/* network.h / 0-057_nofutu                                                   */
+>>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -98,8 +106,12 @@ namespace realX
 	typedef std::vector<Mapping_vector> Mappings_vector;
 
     public:
+<<<<<<< HEAD
 	Glucose::Solver* setup_SATSolver(sDouble timeout = -1.0);
 	
+=======
+	Glucose::Solver* setup_SATSolver(sDouble timeout = -1.0);	
+>>>>>>> 057bc7978fd8838ac6c95b33816adf625451a088
 	void setup_LazyPathModel(sBoolEncoder *encoder, sDouble geographical_distance = -1);
 	void setup_LimitedLazyPathModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance = -1);	
 	
