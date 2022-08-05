@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-054_nofutu                             */
+/*                             realX 0-062_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0-054_nofutu                                                   */
+/* graph.cpp / 0-062_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -3953,6 +3953,7 @@ namespace realX
 
     s_DirectedGraph::s_DirectedGraph(const s_DirectedGraph &directed_graph)
 	: m_Arc_cnt(0)
+	, m_waxman_Nodes(directed_graph.m_waxman_Nodes)
     {
 	for (Vertices_vector::const_iterator vertex = directed_graph.m_Vertices.begin(); vertex != directed_graph.m_Vertices.end(); ++vertex)
 	{
@@ -3971,13 +3972,16 @@ namespace realX
 
 	m_Vertices.clear();
 	m_Arcs.clear();	
-	
-	add_Vertices(directed_graph.m_Vertices.size());
-	
+
+	for (Vertices_vector::const_iterator vertex = directed_graph.m_Vertices.begin(); vertex != directed_graph.m_Vertices.end(); ++vertex)
+	{
+	    add_Vertex(vertex->m_capacity);
+	}	
 	for (Arcs_list::const_iterator arc = directed_graph.m_Arcs.begin(); arc != directed_graph.m_Arcs.end(); ++arc)	
 	{
 	    add_Arrow(arc->m_source->m_id, arc->m_target->m_id, arc->m_capacity);
 	}
+	m_waxman_Nodes = directed_graph.m_waxman_Nodes;
 	
 	return *this;
     }
@@ -4037,7 +4041,7 @@ namespace realX
 	    sInt_32 capacity = 50 + rnd2 * 50;
 
 	    add_Vertex(capacity);
-	    
+	    m_waxman_Nodes.push_back(selected_Nodes[u]);
 	}
 	
 	for (sInt_32 u = 1; u < selected_Nodes.size(); ++u)
@@ -4112,7 +4116,7 @@ namespace realX
 	    sInt_32 capacity = rnd2 * 20;
 
 	    add_Vertex(capacity);
-	    
+	    m_waxman_Nodes.push_back(selected_Nodes[u]);	    
 	}
 	
 	for (sInt_32 u = 1; u < selected_Nodes.size(); ++u)

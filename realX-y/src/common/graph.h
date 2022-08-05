@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-054_nofutu                             */
+/*                             realX 0-062_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 0-054_nofutu                                                     */
+/* graph.h / 0-062_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -590,6 +590,8 @@ namespace realX
 	
 	Vertices_vector m_Vertices;
 	Arcs_list m_Arcs;
+
+	WaxmanNodes_vector m_waxman_Nodes;
     }; 
 
     
