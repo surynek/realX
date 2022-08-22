@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-063_nofutu                             */
+/*                             realX 0-065_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-063_nofutu                                             */
+/* waxman_test.cpp / 0-065_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -423,7 +423,7 @@ sResult waxman_test_5(void)
     sBoolEncoder encoder;
     Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
 	
-    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(500, 0.5, 0.5, 50, 50);
     path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
@@ -432,7 +432,7 @@ sResult waxman_test_5(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-
+    
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
@@ -450,6 +450,7 @@ sResult waxman_test_5(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
+    
 /*
     embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &embedding_Model.m_virtual_Networks.back();
@@ -626,7 +627,6 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
         return result;
     } 
 */
-
 /*
     if (sFAILED(result = waxman_test_5()))
     {
@@ -634,20 +634,19 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
-    
+/*
     if (sFAILED(result = waxman_test_6()))
     {
 	printf("Test waxman 6 failed (error:%d).\n", result);
 	return result;
     }        
+*/
 
-    /*
     if (sFAILED(result = waxman_test_7()))
     {
 	printf("Test waxman 6 failed (error:%d).\n", result);
 	return result;
     }            
-    */
    
     return sRESULT_SUCCESS;
 }
