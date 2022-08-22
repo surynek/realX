@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-061_nofutu                             */
+/*                             realX 0-063_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-061_nofutu                                             */
+/* waxman_test.cpp / 0-063_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -503,24 +503,23 @@ sResult waxman_test_6(void)
     s_DirectedGraph physical_network;
     physical_network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
     physical_network.to_Screen();
-
+    
     path_embedding_Model.setup_PhysicalNetwork_online(physical_network);
-
-
+    	
     for (sInt_32 i = 0; i < 4; ++i)
     {
 	s_DirectedGraph virtual_network;
 	virtual_network.generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
 	virtual_network.to_Screen();
-    
+	
 	sInt_32 depth = 10;
 	sDouble geographical_distance = 15.0;
-
+	
 	path_embedding_Model.setup_VirtualNetwork_online(virtual_network);
-
+	
 	sEmbeddingModel::Mappings_vector vertex_Embeddings;
 	sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    	
-
+	
 	if (path_embedding_Model.solve_LazyPathModel_online(depth, geographical_distance, vertex_Embeddings, path_Embeddings))
 	{
 	    path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
@@ -533,6 +532,56 @@ sResult waxman_test_6(void)
 	printf("--------------------------------\n");
     }
     time_finish = clock();
+
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_7(void)
+{
+    clock_t time_start, time_finish;
+
+    for (sInt_32 step = 0; step < 16; ++step)
+    {
+	time_start = clock();
+	sPathEmbeddingModel path_embedding_Model;
+
+	s_DirectedGraph physical_network;
+	physical_network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+	physical_network.to_Screen();
+
+	path_embedding_Model.setup_PhysicalNetwork_online(physical_network);
+
+	
+	for (sInt_32 i = 0; i < 4; ++i)
+	{
+	    s_DirectedGraph virtual_network;
+	    virtual_network.generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+	    virtual_network.to_Screen();
+	    
+	    sInt_32 depth = 10;
+	    sDouble geographical_distance = 15.0;
+	    
+	    path_embedding_Model.setup_VirtualNetwork_online(virtual_network);
+	    
+	    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+	    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    	
+	    
+	    if (path_embedding_Model.solve_LazyPathModel_online(depth, geographical_distance, vertex_Embeddings, path_Embeddings))
+	    {
+		path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+		printf("Finally a correct embedding has been found !\n");		
+	    }
+	    else
+	    {
+		printf("Embedding does NOT exist.\n");
+	    }
+	    printf("--------------------------------\n");
+	}
+	time_finish = clock();
+    }
     printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
    
     return sRESULT_SUCCESS;
@@ -591,6 +640,14 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	printf("Test waxman 6 failed (error:%d).\n", result);
 	return result;
     }        
+
+    /*
+    if (sFAILED(result = waxman_test_7()))
+    {
+	printf("Test waxman 6 failed (error:%d).\n", result);
+	return result;
+    }            
+    */
    
     return sRESULT_SUCCESS;
 }
