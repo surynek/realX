@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-071_nofutu                             */
+/*                             realX 0-073_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-071_nofutu                                                 */
+/* network.cpp / 0-073_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -593,6 +593,7 @@ namespace realX
 	time_finish = clock();
 	printf("Intermediate time: %.3f\n", (time_finish - time_begin) / (sDouble)CLOCKS_PER_SEC);
 
+	printf("alpha 3\n");	    	
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
@@ -607,6 +608,7 @@ namespace realX
 		encoder->cast_Disjunction(solver, mapping_IDs);
 	    }
 	}
+	printf("alpha 4\n");	    	
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
@@ -646,10 +648,12 @@ namespace realX
 	    }
 	}
 	*/
+	printf("alpha 5\n");	    	
 	if (m_geographical_distance >= 0.0)
 	{
 	    build_GeographicalConstraints(encoder, solver);
-	}	
+	}
+	    printf("alpha 6\n");	    	
     }    
 
 
@@ -996,22 +1000,24 @@ namespace realX
 	    {
 		for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		{
-		    sDouble x1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_x;
-		    sDouble y1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_y;
-
-
-		    sDouble x2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_x;
-		    sDouble y2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_y;
-
-		    sDouble dx = x2 - x1;
-		    sDouble dy = y2 - y1;
-
-		    sDouble distance = sqrt(dx * dx + dy * dy);
-
-		    if (distance > m_geographical_distance)
+		    if (!m_physical_Network.m_waxman_Nodes.empty() && !m_virtual_Networks[vn_id].m_waxman_Nodes.empty())
 		    {
-			sInt_32 vertex_u_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);
-			encoder->cast_BitUnset(solver, vertex_u_mapping_ID);
+			sDouble x1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_x;
+			sDouble y1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_y;
+
+			sDouble x2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_x;
+			sDouble y2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_y;
+
+			sDouble dx = x2 - x1;
+			sDouble dy = y2 - y1;
+
+			sDouble distance = sqrt(dx * dx + dy * dy);
+		    
+			if (distance > m_geographical_distance)
+			{
+			    sInt_32 vertex_u_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);
+			    encoder->cast_BitUnset(solver, vertex_u_mapping_ID);
+			}
 		    }
 		}
 	    }
