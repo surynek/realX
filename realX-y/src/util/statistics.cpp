@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-069_nofutu                             */
+/*                             realX 0-071_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* statistics.cpp / 0-069_nofutu                                              */
+/* statistics.cpp / 0-071_nofutu                                              */
 /*----------------------------------------------------------------------------*/
 //
 // Statistical data collection and analytical tools.

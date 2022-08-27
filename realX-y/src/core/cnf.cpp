@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-069_nofutu                             */
+/*                             realX 0-071_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0-069_nofutu                                                     */
+/* cnf.cpp / 0-071_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -163,6 +163,125 @@ namespace realX
 	}
     }    
 
+
+    void sBoolEncoder::cast_BinaryAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 sUNUSED(weight))
+    {
+	sInt_32 N_identifiers = variable_IDs.size();
+	std::vector<sInt_32> bit_Auxiliaries;
+
+	for (sInt_32 divide = N_identifiers - 1; divide > 0; divide /= 2)
+	{
+	    bit_Auxiliaries.push_back(m_last_variable_ID++);
+	}
+	for (sInt_32 value = 0; value < N_identifiers; ++value)
+	{	   
+	    sInt_32 rotate = value;
+
+	    sInt_32 bit_i = 0;
+	    for (sInt_32 divide = N_identifiers - 1; divide > 0; divide /= 2)
+	    {
+		sInt_32 bit = rotate % 2;
+		rotate /= 2;
+
+		//printf("%d", bit);
+		if (bit == 0)
+		{
+		    //printf("%d,%d\n", -variable_IDs[value], -bit_Auxiliaries[bit_i]);
+		    cast_Clause(solver, -variable_IDs[value], -bit_Auxiliaries[bit_i++]);
+		}
+		else
+		{
+		    //printf("%d,%d\n", -variable_IDs[value], bit_Auxiliaries[bit_i]);		    
+		    cast_Clause(solver, -variable_IDs[value], bit_Auxiliaries[bit_i++]);
+		}
+	    }
+	    //printf("\n");
+	}
+    }
+
+
+    void sBoolEncoder::cast_ProductAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight)
+    {
+	std::vector<sInt_32> vec_U_Auxiliaries;
+	std::vector<sInt_32> vec_V_Auxiliaries;
+
+	sInt_32 N_identifiers = variable_IDs.size();
+	sInt_32 U_vec_size = sqrt(N_identifiers);
+	sInt_32 V_vec_size = U_vec_size;
+
+	if (U_vec_size * V_vec_size < N_identifiers)
+	{
+	    ++V_vec_size;
+
+	    if (U_vec_size * V_vec_size < N_identifiers)
+	    {
+		++U_vec_size;
+		sASSERT(U_vec_size * V_vec_size >= N_identifiers);
+	    }
+	}
+
+	for (sInt_32 point_u = 0; point_u < U_vec_size; ++point_u)
+	{
+	    vec_U_Auxiliaries.push_back(m_last_variable_ID++);
+	}
+	for (sInt_32 point_v = 0; point_v < V_vec_size; ++point_v)
+	{
+	    vec_V_Auxiliaries.push_back(m_last_variable_ID++);
+	}
+	
+	sInt_32 variable = 0;
+
+	for (sInt_32 point_u = 0; point_u < U_vec_size; ++point_u)
+	{
+	    for (sInt_32 point_v = 0; point_v < V_vec_size; ++point_v)
+	    {
+		cast_Clause(solver, -variable_IDs[variable], vec_U_Auxiliaries[point_u]);
+		cast_Clause(solver, -variable_IDs[variable], vec_V_Auxiliaries[point_v]);
+		
+		if (++variable >= N_identifiers)
+		{
+		    cast_AllMutexConstraint(solver, vec_U_Auxiliaries, weight);
+		    cast_AllMutexConstraint(solver, vec_V_Auxiliaries, weight);
+		    
+		    return;
+		}
+	    }	    
+	}
+    }
+
+
+    void sBoolEncoder::cast_CommandAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight)
+    {
+	sInt_32 group_size = 4;
+	sInt_32 group_id = 0;
+	sInt_32 remaining = variable_IDs.size();
+
+	std::vector<sInt_32> command_Auxiliaries;
+	std::vector<int> command_Literals;	    	
+
+	while (remaining > 0)
+	{
+	    command_Auxiliaries.push_back(m_last_variable_ID++);	    
+	    sInt_32 individual_group_size = sMIN(remaining, group_size);
+
+	    std::vector<int> group_Literals;	    
+	    group_Literals.push_back(-command_Auxiliaries[group_id]);
+	    command_Literals.push_back(command_Auxiliaries[group_id]);
+	
+	    for (sInt_32 gi = 0; gi < individual_group_size; ++gi)
+	    {
+		sInt_32 var_id = group_id * group_size + gi;
+		group_Literals.push_back(variable_IDs[var_id]);
+	    }
+	    cast_Clause(solver, group_Literals);
+	    cast_AllMutexConstraint(solver, group_Literals, weight);
+	    
+	    ++group_id;
+	    remaining -= individual_group_size;
+	}
+	cast_AllMutexConstraint(solver, command_Literals, weight);	
+    }            
+    
     
     void sBoolEncoder::cast_Disjunction(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 sUNUSED(weight))
     {

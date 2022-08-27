@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-069_nofutu                             */
+/*                             realX 0-071_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-069_nofutu                                                 */
+/* network.cpp / 0-071_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -897,7 +897,7 @@ namespace realX
 		sInt_32 path_v_id = calc_EdgeEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, phys_u_id, phys_v_id);
 		column_IDs.push_back(path_v_id);
 	    }
-	    encoder->cast_AdaptiveAllMutexConstraint(solver, column_IDs);
+	    encoder->cast_ProductAllMutexConstraint(solver, column_IDs);
 	}
 
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)

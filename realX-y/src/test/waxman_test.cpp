@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-069_nofutu                             */
+/*                             realX 0-071_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-069_nofutu                                             */
+/* waxman_test.cpp / 0-071_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -544,9 +544,9 @@ sResult waxman_test_7(void)
 {
     clock_t time_start, time_finish;
 
-    for (sInt_32 step = 0; step < 1/*16*/; ++step)
+    time_start = clock();    
+    for (sInt_32 step = 0; step < 1; ++step)
     {
-	time_start = clock();
 	sPathEmbeddingModel path_embedding_Model;
 
 	s_DirectedGraph physical_network;
@@ -556,7 +556,7 @@ sResult waxman_test_7(void)
 	path_embedding_Model.setup_PhysicalNetwork_online(physical_network);
 
 	
-	for (sInt_32 i = 0; i < 1/*4*/; ++i)
+	for (sInt_32 i = 0; i < 4; ++i)
 	{
 	    s_DirectedGraph virtual_network;
 	    virtual_network.generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
@@ -627,13 +627,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
         return result;
     } 
 */
-
+/*
     if (sFAILED(result = waxman_test_5()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }
-    
+*/
 /*
     if (sFAILED(result = waxman_test_6()))
     {
@@ -641,13 +641,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }        
 */
-/*
+
     if (sFAILED(result = waxman_test_7()))
     {
 	printf("Test waxman 6 failed (error:%d).\n", result);
 	return result;
     }            
-*/
+
     return sRESULT_SUCCESS;
 }
     
