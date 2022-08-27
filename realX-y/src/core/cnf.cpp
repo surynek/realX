@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-066_nofutu                             */
+/*                             realX 0-069_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0-066_nofutu                                                     */
+/* cnf.cpp / 0-069_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -74,20 +74,12 @@ namespace realX
 	sInt_32 N_Identifiers = variable_IDs.size();
 	sInt_32 N_Identifiers_1 = N_Identifiers - 1;
 
-	typedef std::vector<int> CNFs_vector;
-	CNFs_vector prec_IDs;
-	prec_IDs.resize(N_Identifiers);
-
-	for (sInt_32 id = 0; id < N_Identifiers; ++id)
-	{
-	    prec_IDs[id] = variable_IDs[id];
-	}
-	
 	for (sInt_32 id_A = 0; id_A < N_Identifiers_1; ++id_A)
 	{
 	    for (sInt_32 id_B = id_A + 1; id_B < N_Identifiers; ++id_B)
 	    {
-		cast_Clause(solver, -prec_IDs[id_A], -prec_IDs[id_B]);
+//		cast_Clause(solver, -prec_IDs[id_A], -prec_IDs[id_B]);
+		cast_Clause(solver, -variable_IDs[id_A], -variable_IDs[id_B]);
 
                 #ifdef sSTATISTICS
 		{
@@ -119,15 +111,6 @@ namespace realX
 	{
 	    partial_sum_1[id] = m_last_variable_ID++;
 	}	
-   
-	typedef std::vector<int> CNFs_vector;
-	CNFs_vector prec_IDs;
-	prec_IDs.resize(N_Identifiers);
-
-	for (sInt_32 id = 0; id < N_Identifiers; ++id)
-	{
-	    prec_IDs[id] = variable_IDs[id];
-	}
 	
 	for (sInt_32 id = 0; id < N_Identifiers_1; ++id)
 	{
@@ -166,9 +149,10 @@ namespace realX
 //	if (variable_IDs.size() <= 4)
 //	if (variable_IDs.size() <= 6)
 //	if (variable_IDs.size() <= 8)	
-	if (variable_IDs.size() <= 16)	    
-//	if (variable_IDs.size() <= 32)
-//	if (variable_IDs.size() <= 64)	
+//	if (variable_IDs.size() <= 16)	    
+	if (variable_IDs.size() <= 32)
+//	if (variable_IDs.size() <= 64)
+//	if (variable_IDs.size() <= 128)	
 //	if (variable_IDs.size() <= 512)
 	{
 	    cast_AllMutexConstraint(solver, variable_IDs, weight);
@@ -831,27 +815,45 @@ namespace realX
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
+	*/
+	int Lits[3];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = 0;
 	
-	cast_Clause(solver, Lits);
+	cast_Clause_(solver, Lits);
     }
 
     
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
 	Lits.push_back(lit_3);
 		
 	cast_Clause(solver, Lits);
+	*/
+	int Lits[4];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = lit_3;	
+	Lits[3] = 0;
+	
+	cast_Clause_(solver, Lits);	
     }
 
 
     void sBoolEncoder::cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3,sInt_32 lit_4)
     {
+	/*
 	std::vector<int> Lits;
 	Lits.push_back(lit_1);
 	Lits.push_back(lit_2);
@@ -859,6 +861,16 @@ namespace realX
 	Lits.push_back(lit_4);	
 		
 	cast_Clause(solver, Lits);
+	*/
+	int Lits[5];
+
+	Lits[0] = lit_1;
+	Lits[1] = lit_2;
+	Lits[2] = lit_3;
+	Lits[3] = lit_4;		
+	Lits[4] = 0;
+
+	cast_Clause_(solver, Lits);
     }    
 
     
@@ -879,6 +891,24 @@ namespace realX
 //	printf("0\n");
 	solver->addClause(glu_Lits);
     }
+
+    
+    void sBoolEncoder::cast_Clause_(Glucose::Solver *solver, int *Lits)
+    {
+	Glucose::vec<Glucose::Lit> glu_Lits;
+	
+	while (*Lits != 0)
+	{
+	    sInt_32 glu_var = sABS(*Lits) - 1;
+	    while (glu_var >= solver->nVars())
+	    {
+		solver->newVar();
+	    }
+	    glu_Lits.push((*Lits > 0) ? Glucose::mkLit(glu_var, false) : ~Glucose::mkLit(glu_var, false));
+	    ++Lits;
+	}
+	solver->addClause(glu_Lits);	
+    }    
 
     
 /*----------------------------------------------------------------------------*/

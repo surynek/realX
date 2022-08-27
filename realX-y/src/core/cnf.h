@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-066_nofutu                             */
+/*                             realX 0-069_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 0-066_nofutu                                                       */
+/* cnf.h / 0-069_nofutu                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -226,7 +226,8 @@ namespace realX
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3, sInt_32 lit_4);	
-	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);	
+	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);
+	void cast_Clause_(Glucose::Solver *solver, int *Lits);	
 
     public:
 	sInt_32 m_last_variable_ID;

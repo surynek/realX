@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-066_nofutu                             */
+/*                             realX 0-069_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-066_nofutu                                                 */
+/* network.cpp / 0-069_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -781,8 +781,7 @@ namespace realX
 	*/
     }
 
-
-    /*
+/*
     void sPathEmbeddingModel::build_LimitedIndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 virt_v_id, sInt_32 neighbor_index, sInt_32 depth)
     {
 	sASSERT(depth >= 2 && depth < m_physical_Network.get_VertexCount());
@@ -862,13 +861,12 @@ namespace realX
 		    //sInt_32 path_v_id = calc_EdgeEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, phys_u_id + 1, phys_neighbor_id);
 		    target_IDs.push_back(path_v_id);
 		}	
-		//sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vnet_id, virt_v_id, phys_v_id);
+		sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vnet_id, virt_v_id, phys_v_id);
 //		encoder->cast_ImpliedMultiImplication(solver, vertex_v_mapping_ID, path_u_id, target_IDs);		    
 
 		target_IDs.push_back(vertex_v_mapping_ID);		
 		encoder->cast_MultiImplication(solver, path_u_id, target_IDs);
 		++path_u_id;
-		++vertex_v_mapping_ID;
 	    }
 	}
 
@@ -884,7 +882,8 @@ namespace realX
 
 	}
     }
-    */
+*/
+    
 
     void sPathEmbeddingModel::build_LimitedIndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 virt_v_id, sInt_32 neighbor_index, sInt_32 depth)
     {
@@ -901,7 +900,6 @@ namespace realX
 	    encoder->cast_AdaptiveAllMutexConstraint(solver, column_IDs);
 	}
 
-	
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sBoolEncoder::VariableIDs_vector row_IDs;
@@ -911,8 +909,8 @@ namespace realX
 		row_IDs.push_back(path_u_id);
 	    }
 	    encoder->cast_AdaptiveAllMutexConstraint(solver, row_IDs);	    
-	}
-  
+	}       	
+
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{		
 	    sInt_32 path_u_id = calc_EdgeEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, 0, phys_v_id);
@@ -931,6 +929,7 @@ namespace realX
 	    if (!target_IDs.empty())
 	    {
 		encoder->cast_MultiImplication(solver, path_u_id, target_IDs);
+//		encoder->cast_AdaptiveAllMutexConstraint(solver, target_IDs);
 	    }
 	    else
 	    {
@@ -1295,6 +1294,7 @@ namespace realX
 		decode_LimitedEdgeEmbeddingMapping(variable_ID, vnet_id, u_id, v_id, neighbor_index, phys_u_id, path_index, depth);
 		sASSERT(phys_u_id != -1 && path_index != -1);
 
+		sASSERT(path_Embeddings[vnet_id][u_id][neighbor_index][path_index] == -1);
 		path_Embeddings[vnet_id][u_id][neighbor_index][path_index] = phys_u_id;
 //		printf("vnet_id: %d, u_id: %d, v_id:%d, phys_u_id:%d, path_index:%d\n", vnet_id, u_id, v_id, phys_u_id, path_index);
 	    }
@@ -1508,9 +1508,10 @@ namespace realX
 			if (last_vertex_id >= 0 && path_vertex_id >= 0)
 			{
 			    sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
-			    
+			    printf("----\n");
 			    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
 			    {
+				printf("%d,%d,%d (%d)\n", path_index, (*phys_neighbor)->m_target->m_id, path_vertex_id, last_vertex_id);
 				if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
 				{
 				    phys_neighbor_index = phys_neigh_index;
