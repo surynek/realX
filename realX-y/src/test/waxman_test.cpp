@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-083_nofutu                             */
+/*                             realX 0-086_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-083_nofutu                                             */
+/* waxman_test.cpp / 0-086_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -594,12 +594,6 @@ sResult waxman_test_5_graph(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
-    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
-    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
-
-    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
-    virtual_network->to_Screen();
 
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
@@ -612,7 +606,13 @@ sResult waxman_test_5_graph(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
 /*
     embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &embedding_Model.m_virtual_Networks.back();
@@ -707,7 +707,7 @@ sResult waxman_test_7(void)
     clock_t time_start, time_finish;
 
     time_start = clock();    
-    for (sInt_32 step = 0; step < 1; ++step)
+    for (sInt_32 step = 0; step < 4; ++step)
     {
 	sPathEmbeddingModel path_embedding_Model;
 
@@ -721,7 +721,7 @@ sResult waxman_test_7(void)
 	for (sInt_32 i = 0; i < 4; ++i)
 	{
 	    s_DirectedGraph virtual_network;
-	    virtual_network.generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+	    virtual_network.generate_DirectedWaxman(32, 0.5, 0.5, 50, 50);
 	    virtual_network.to_Screen();
 	    
 	    sInt_32 depth = 10;
@@ -756,7 +756,7 @@ sResult waxman_test_7_tree(void)
     clock_t time_start, time_finish;
 
     time_start = clock();    
-    for (sInt_32 step = 0; step < 1; ++step)
+    for (sInt_32 step = 0; step < 4; ++step)
     {
 	sPathEmbeddingModel path_embedding_Model;
 
@@ -770,7 +770,7 @@ sResult waxman_test_7_tree(void)
 	for (sInt_32 i = 0; i < 4; ++i)
 	{
 	    s_DirectedGraph virtual_network;
-	    virtual_network.generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+	    virtual_network.generate_DirectedWaxman(32, 0.5, 0.5, 50, 50);
 	    virtual_network.to_Screen();
 	    
 	    sInt_32 depth = 10;
@@ -782,6 +782,55 @@ sResult waxman_test_7_tree(void)
 	    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    	
 	    
 	    if (path_embedding_Model.solve_LazyTreeModel_online(depth, geographical_distance, vertex_Embeddings, path_Embeddings))
+	    {
+		path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+		printf("Finally a correct embedding has been found !\n");		
+	    }
+	    else
+	    {
+		printf("Embedding does NOT exist.\n");
+	    }
+	    printf("--------------------------------\n");
+	}
+	time_finish = clock();
+    }
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_7_graph(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();    
+    for (sInt_32 step = 0; step < 4; ++step)
+    {
+	sPathEmbeddingModel path_embedding_Model;
+
+	s_DirectedGraph physical_network;
+	physical_network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+	physical_network.to_Screen();
+
+	path_embedding_Model.setup_PhysicalNetwork_online(physical_network);
+
+	
+	for (sInt_32 i = 0; i < 4; ++i)
+	{
+	    s_DirectedGraph virtual_network;
+	    virtual_network.generate_DirectedWaxman(32, 0.5, 0.5, 50, 50);
+	    virtual_network.to_Screen();
+	    
+	    sInt_32 depth = 10;
+	    sDouble geographical_distance = 15.0;
+	    
+	    path_embedding_Model.setup_VirtualNetwork_online(virtual_network);
+	    
+	    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+	    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    	
+	    
+	    if (path_embedding_Model.solve_LazyGraphModel_online(depth, geographical_distance, vertex_Embeddings, path_Embeddings))
 	    {
 		path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
 		printf("Finally a correct embedding has been found !\n");		
@@ -917,12 +966,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
+
     if (sFAILED(result = waxman_test_5_graph()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }    
-  
+
 /*
     if (sFAILED(result = waxman_test_6()))
     {
@@ -939,6 +989,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 */
 /*
     if (sFAILED(result = waxman_test_7_tree()))
+    {
+	printf("Test waxman 7 failed (error:%d).\n", result);
+	return result;
+    } 
+*/
+/*
+    if (sFAILED(result = waxman_test_7_graph()))
     {
 	printf("Test waxman 7 failed (error:%d).\n", result);
 	return result;
