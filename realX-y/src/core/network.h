@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-081_nofutu                             */
+/*                             realX 0-083_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-081_nofutu                                                   */
+/* network.h / 0-083_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -160,6 +160,7 @@ namespace realX
 
 	void decode_LazyGraphModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkGraphMappings_vector &graph_Embeddings);
 	void decode_LimitedLazyGraphModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkGraphMappings_vector &graph_Embeddings, sInt_32 depth);
+	void transform_LimitedGraph2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkGraphMappings_vector &graph_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
 	
 	bool refine_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
 	bool refine_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
@@ -167,8 +168,8 @@ namespace realX
 	bool refine_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
 	bool refine_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
 
-	bool refine_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkGraphMappings_vector &graph_Embeddings);	
-	bool refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkGraphMappings_vector &graph_Embeddings, sInt_32 depth);		
+	bool refine_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
+	bool refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);		
 
 	sInt_32 calc_VertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 phys_v_id) const;
 	sInt_32 calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const;

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-081_nofutu                             */
+/*                             realX 0-083_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-081_nofutu                                                 */
+/* network.cpp / 0-083_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -1162,7 +1162,7 @@ namespace realX
 		{		    
 		    sInt_32 virt_neighbor_id = (*virt_neighbor)->m_target->m_id;
 
-		    build_LimitedIndividualTreeModel(encoder, solver, vn_id, virt_u_id, virt_neighbor_id, neighbor_index, depth);
+		    build_LimitedIndividualGraphModel(encoder, solver, vn_id, virt_u_id, virt_neighbor_id, neighbor_index, depth);
 		    ++neighbor_index;
 		}		    
 	    }
@@ -2118,7 +2118,7 @@ namespace realX
     void sPathEmbeddingModel::build_LimitedIndividualGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 virt_v_id, sInt_32 neighbor_index, sInt_32 depth)
     {
 	sASSERT(depth >= 2 && depth < m_physical_Network.get_VertexCount());
-
+/*
 	for (sInt_32 phys_u_id = 0; phys_u_id < depth; ++phys_u_id)
 	{
 	    sBoolEncoder::VariableIDs_vector column_IDs;
@@ -2130,7 +2130,6 @@ namespace realX
 	    encoder->cast_ProductAllMutexConstraint(solver, column_IDs);
 	}
 
-/*
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sBoolEncoder::VariableIDs_vector row_IDs;
@@ -2483,10 +2482,14 @@ namespace realX
 
 		NetworkGraphMappings_vector graph_Embeddings;
 		
-		printf("Virtual network embedding found !\n");	    	    
+		printf("Virtual network embedding found !\n");
+		printf("deco 0\n");		
 		decode_LimitedLazyGraphModel(solver, vertex_Embeddings, graph_Embeddings, depth);
+		printf("deco 1\n");
+		transform_LimitedGraph2PathEmbeddings(vertex_Embeddings, graph_Embeddings, path_Embeddings, depth);
+		printf("deco 2\n");		
 
-		if (refine_LimitedLazyGraphModel(encoder, solver, vertex_Embeddings, graph_Embeddings, depth))
+		if (refine_LimitedLazyGraphModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
 		{
 		    printf("Model has been refined ...\n");		
 		}
@@ -3117,7 +3120,128 @@ namespace realX
 		printf("vnet_id: %d, u_id: %d, v_id:%d, phys_u_id:%d, path_index:%d\n", vnet_id, u_id, v_id, phys_u_id, path_index);
 	    }
 	}
-    }        
+    }
+
+
+    void sPathEmbeddingModel::transform_LimitedGraph2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkGraphMappings_vector &graph_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth)
+    {
+	path_Embeddings.resize(m_virtual_Networks.size());
+	
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    path_Embeddings[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());
+
+	    for (sInt_32 i = 0; i < m_virtual_Networks[vn_id].get_VertexCount(); ++i)
+	    {
+		sInt_32 neighbor_index = 0;
+
+		path_Embeddings[vn_id][i].resize(m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.size());
+		    
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    path_Embeddings[vn_id][i][neighbor_index].resize(depth, -1);
+		    ++neighbor_index;
+		}
+	    }
+	}
+	
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    for (sInt_32 i = 0; i < m_virtual_Networks[vn_id].get_VertexCount(); ++i)
+	    {
+		sInt_32 neighbor_index = 0;
+
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    printf("%d -- %d\n", vertex_Embeddings[vn_id][i], vertex_Embeddings[vn_id][(*virt_neighbor)->m_target->m_id]);
+		    
+		    std::vector<std::vector<sInt_32> > previous;
+		    previous.resize(depth);
+		    previous[1].resize(graph_Embeddings[vn_id][i][neighbor_index][1].size(), -1);
+
+		    for (sInt_32 ed1 = 0; ed1 < graph_Embeddings[vn_id][i][neighbor_index][0].size(); ++ed1)
+		    {
+			if (graph_Embeddings[vn_id][i][neighbor_index][0][ed1] == vertex_Embeddings[vn_id][i])
+			{
+			    for (sInt_32 ed2 = 0; ed2 < graph_Embeddings[vn_id][i][neighbor_index][1].size(); ++ed2)
+			    {
+				printf("%d x %d\n", graph_Embeddings[vn_id][i][neighbor_index][0][ed1], graph_Embeddings[vn_id][i][neighbor_index][1][ed2]);				
+				if (previous[1][ed2] == -1)
+				{
+				    printf("+\n");
+				    if (m_physical_Network.is_LinkedTo(graph_Embeddings[vn_id][i][neighbor_index][0][ed1], graph_Embeddings[vn_id][i][neighbor_index][1][ed2]))
+				    {
+					printf("*\n");
+					previous[1][ed2] = ed1;
+				    }
+				}
+			    }
+			}
+		    }
+		    
+		    for (sInt_32 d = 1; d < depth - 1; ++d)
+		    {
+			previous[d+1].resize(graph_Embeddings[vn_id][i][neighbor_index][d+1].size(), -1);
+			printf("d:%d\n", d);
+			for (sInt_32 ed1 = 0; ed1 < graph_Embeddings[vn_id][i][neighbor_index][d].size(); ++ed1)
+			{
+			    for (sInt_32 ed2 = 0; ed2 < graph_Embeddings[vn_id][i][neighbor_index][d+1].size(); ++ed2)
+			    {
+				printf("%d x %d\n", graph_Embeddings[vn_id][i][neighbor_index][d][ed1], graph_Embeddings[vn_id][i][neighbor_index][d+1][ed2]);								
+				if (previous[d+1][ed2] == -1)
+				{				    
+				    printf("+\n");
+				    if (m_physical_Network.is_LinkedTo(graph_Embeddings[vn_id][i][neighbor_index][d][ed1], graph_Embeddings[vn_id][i][neighbor_index][d+1][ed2]))
+				    {
+					printf("*\n");
+					previous[d+1][ed2] = ed1;
+				    }
+				}				
+			    } 
+			}
+		    }
+
+		    for (sInt_32 ii = 0; ii < depth; ++ii)
+		    {
+			printf("%d: ", ii);
+			for (sInt_32 jj = 0; jj < previous[ii].size(); ++jj)
+			{
+			    if (previous[ii][jj] >= 0)
+			    {		    
+				printf("%d (%d)\t", previous[ii][jj], graph_Embeddings[vn_id][i][neighbor_index][ii-1][previous[ii][jj]]);
+			    }
+			    else
+			    {
+				printf("-1\t");
+			    }
+			}
+			printf("\n");
+		    }
+
+		    for (sInt_32 d = 0; d < depth; ++d)
+		    {
+			for (sInt_32 ed = 0; ed < graph_Embeddings[vn_id][i][neighbor_index][d].size(); ++ed)
+			{			
+			    if (vertex_Embeddings[vn_id][(*virt_neighbor)->m_target->m_id] == graph_Embeddings[vn_id][i][neighbor_index][d][ed])
+			    {
+				if (previous[d][ed] != -1)
+				{
+				    path_Embeddings[vn_id][i][neighbor_index][d] = graph_Embeddings[vn_id][i][neighbor_index][d][ed];
+				    sInt_32 dd = d;
+				    while (dd > 0)
+				    {
+				    }
+				}
+			    }
+			}
+		    }
+		    getchar();
+
+		    ++neighbor_index;		    
+		}
+	    }
+	}
+    }
     
 
     bool sPathEmbeddingModel::refine_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &virtual_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings)
@@ -3629,7 +3753,7 @@ namespace realX
     }        
 
 
-    bool sPathEmbeddingModel::refine_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &virtual_Embeddings, const sPathEmbeddingModel::NetworkGraphMappings_vector &graph_Embeddings)
+    bool sPathEmbeddingModel::refine_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &virtual_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings)
     {
 	bool refined = false;
 	
@@ -3702,35 +3826,31 @@ namespace realX
 //		    for (sInt_32 path_index = 0; path_index < m_virtual_Networks[vn_id].get_VertexCount(); ++path_index)
 		    {
 			sDouble capacity = (*virt_neighbor)->m_capacity;
+			sInt_32 path_vertex_id = path_Embeddings[vn_id][virt_v_id][neigh_index][path_index];
 
-			for (sInt_32 ed = 0; ed < graph_Embeddings[vn_id][virt_v_id][neigh_index][path_index].size(); ++ed)
-			{
-			    sInt_32 path_vertex_id = graph_Embeddings[vn_id][virt_v_id][neigh_index][path_index][ed];
-
-			    sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
-
-			    if (last_vertex_id >= 0 && path_vertex_id >= 0)
-			    {			    
-				sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
-			    
-				for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
+			sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
+			
+			if (last_vertex_id >= 0 && path_vertex_id >= 0)
+			{			    
+			    sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
+				
+			    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
+			    {
+				if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
 				{
-				    if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
-				    {
-					phys_neighbor_index = phys_neigh_index;
-					break;
-				    }
-				    ++phys_neigh_index;
+				    phys_neighbor_index = phys_neigh_index;
+				    break;
 				}
-				sASSERT(phys_neighbor_index != -1);
-
-				edge_Saturations[last_vertex_id][phys_neighbor_index] += capacity;
-				edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(last_nogood_var);
-				edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(nogood_variable);
+				++phys_neigh_index;
 			    }
-			    last_vertex_id = path_vertex_id;
-			    last_nogood_var = nogood_variable;			    
+			    sASSERT(phys_neighbor_index != -1);
+
+			    edge_Saturations[last_vertex_id][phys_neighbor_index] += capacity;
+			    edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(last_nogood_var);
+			    edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(nogood_variable);
 			}
+			last_vertex_id = path_vertex_id;
+			last_nogood_var = nogood_variable;			    
 		    }
 		    ++neigh_index;
 		}
@@ -3759,7 +3879,7 @@ namespace realX
     }
 
 
-    bool sPathEmbeddingModel::refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &virtual_Embeddings, const sPathEmbeddingModel::NetworkGraphMappings_vector &graph_Embeddings, sInt_32 depth)
+    bool sPathEmbeddingModel::refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &virtual_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth)
     {
 	bool refined = false;
 	
@@ -3834,36 +3954,32 @@ namespace realX
 //		    for (sInt_32 path_index = 0; path_index < m_virtual_Networks[vn_id].get_VertexCount(); ++path_index)
 		    {			
 			sDouble capacity = (*virt_neighbor)->m_capacity;
+			sInt_32 path_vertex_id = path_Embeddings[vn_id][virt_v_id][neigh_index][path_index];
 
-			for (sInt_32 ed = 0; ed < graph_Embeddings[vn_id][virt_v_id][neigh_index][path_index].size(); ++ed)
-			{			
-			    sInt_32 path_vertex_id = graph_Embeddings[vn_id][virt_v_id][neigh_index][path_index][ed];
-
-			    sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
+			sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
 			    
-			    if (last_vertex_id >= 0 && path_vertex_id >= 0)
+			if (last_vertex_id >= 0 && path_vertex_id >= 0)
+			{
+			    sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
+			    printf("----\n");
+			    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
 			    {
-				sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
-				printf("----\n");
-				for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
+				printf("%d,%d,%d (%d)\n", path_index, (*phys_neighbor)->m_target->m_id, path_vertex_id, last_vertex_id);
+				if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
 				{
-				    printf("%d,%d,%d (%d)\n", path_index, (*phys_neighbor)->m_target->m_id, path_vertex_id, last_vertex_id);
-				    if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
-				    {
-					phys_neighbor_index = phys_neigh_index;
-					break;
-				    }
-				    ++phys_neigh_index;
-				}			    
-				sASSERT(phys_neighbor_index != -1);
-				
-				edge_Saturations[last_vertex_id][phys_neighbor_index] += capacity;
-				edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(last_nogood_var);
-				edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(nogood_variable);
-			    }
-			    last_vertex_id = path_vertex_id;
-			    last_nogood_var = nogood_variable;
+				    phys_neighbor_index = phys_neigh_index;
+				    break;
+				}
+				++phys_neigh_index;
+			    }			    
+			    sASSERT(phys_neighbor_index != -1);
+			    
+			    edge_Saturations[last_vertex_id][phys_neighbor_index] += capacity;
+			    edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(last_nogood_var);
+			    edge_Nogoods[last_vertex_id][phys_neighbor_index].push_back(nogood_variable);
 			}
+			last_vertex_id = path_vertex_id;
+			last_nogood_var = nogood_variable;
 		    }
 		    printf("========\n");
 		    ++neigh_index;

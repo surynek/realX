@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-081_nofutu                             */
+/*                             realX 0-083_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0-081_nofutu                                                   */
+/* graph.cpp / 0-083_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -4258,7 +4258,7 @@ namespace realX
 	{
 	    for (s_Vertex::Neighbors_vector::const_iterator v_neighbor = m_Vertices[v_id].m_in_Neighbors.begin(); v_neighbor != m_Vertices[v_id].m_in_Neighbors.end(); ++v_neighbor)
 	    {
-		if ((*v_neighbor)->m_target->m_id == u_id)
+		if ((*v_neighbor)->m_source->m_id == u_id)
 		{
 		    return true;
 		}
