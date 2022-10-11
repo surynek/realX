@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-087_nofutu                             */
+/*                             realX 0-088_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-087_nofutu                                             */
+/* waxman_test.cpp / 0-088_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -424,15 +424,16 @@ sResult waxman_test_5(void)
     Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
 	
     path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
-    path_embedding_Model.m_physical_Network.to_Screen();
+    //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
+
+    /*
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
@@ -450,7 +451,8 @@ sResult waxman_test_5(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
+    */    
+
 /*
     embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &embedding_Model.m_virtual_Networks.back();
@@ -466,7 +468,7 @@ sResult waxman_test_5(void)
     virtual_network->to_Screen();    
 */
     sInt_32 depth = 10;
-    sDouble geographical_distance = 15.0;
+    sDouble geographical_distance = 35.0;
 
     printf("Building model ...\n");
     path_embedding_Model.setup_LimitedLazyPathModel(&encoder, depth, geographical_distance);
@@ -494,7 +496,7 @@ sResult waxman_test_5(void)
 }
 
 
-sResult waxman_test_5_tree(void)
+sResult waxman_test_5_geo_circ(void)
 {
     clock_t time_start, time_finish;
 
@@ -505,15 +507,16 @@ sResult waxman_test_5_tree(void)
     Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
 	
     path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
-    path_embedding_Model.m_physical_Network.to_Screen();
+    //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
+
+    /*
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
@@ -531,7 +534,8 @@ sResult waxman_test_5_tree(void)
 
     virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
-    
+    */    
+
 /*
     embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &embedding_Model.m_virtual_Networks.back();
@@ -549,6 +553,94 @@ sResult waxman_test_5_tree(void)
     sInt_32 depth = 10;
     sDouble geographical_distance = 15.0;
 
+    sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
+
+    printf("Building model ...\n");
+    path_embedding_Model.setup_LimitedLazyPathModel(&encoder, depth, geographical_distance);
+    //path_embedding_Model.to_Screen();
+
+    path_embedding_Model.build_LimitedLazyPathModel(&encoder, solver, depth, &geo_Circles);
+    printf("Building model ... finished\n");
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
+
+    if (path_embedding_Model.solveAll_LazyPathModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	printf("Finally a correct embedding has been found !\n");		
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");
+    }    
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_5_tree(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+    Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
+	
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+//    path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+    
+/*  
+    virtual_network->generate_DirectedWaxman(33, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+*/
+    
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+        
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+/*
+    embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+
+    virtual_network->add_Arrow(0, 1, 1.0);
+    virtual_network->add_Arrow(0, 2, 1.0);
+    virtual_network->add_Arrow(1, 2, 1.0);
+
+    virtual_network->to_Screen();    
+*/
+    sInt_32 depth = 10;
+    sDouble geographical_distance = 15.0; // -1.0;
+
     printf("Building model ...\n");
     path_embedding_Model.setup_LimitedLazyTreeModel(&encoder, depth, geographical_distance);
     //path_embedding_Model.to_Screen();
@@ -560,6 +652,95 @@ sResult waxman_test_5_tree(void)
     sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
 
     if (path_embedding_Model.solveAll_LazyTreeModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	printf("Finally a correct embedding has been found !\n");		
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");
+    }    
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_5_tree_geo_circ(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+    Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
+	
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+//    path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+    
+  
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+/*    
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+        
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+*/
+
+/*
+    embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+
+    virtual_network->add_Arrow(0, 1, 1.0);
+    virtual_network->add_Arrow(0, 2, 1.0);
+    virtual_network->add_Arrow(1, 2, 1.0);
+
+    virtual_network->to_Screen();    
+*/
+    sInt_32 depth = 10;
+    sDouble geographical_distance = 15.0; // -1.0;
+
+    sPathEmbeddingModel::GeoCircles_vector geo_Circles;        
+
+    printf("Building model ...\n");
+    path_embedding_Model.setup_LimitedLazyTreeModel(&encoder, depth, geographical_distance);
+    //path_embedding_Model.to_Screen();
+
+    path_embedding_Model.build_LimitedLazyTreeModel(&encoder, solver, depth, &geo_Circles);
+    printf("Building model ... finished\n");
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
+
+    if (path_embedding_Model.solveAll_LazyTreeModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
     {
 	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
 	printf("Finally a correct embedding has been found !\n");		
@@ -641,6 +822,93 @@ sResult waxman_test_5_graph(void)
     sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
 
     if (path_embedding_Model.solveAll_LazyGraphModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	printf("Finally a correct embedding has been found !\n");		
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");
+    }    
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_5_graph_geo_circ(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+    Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
+	
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();    
+/*
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+*/
+
+/*
+    embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+
+    virtual_network->add_Arrow(0, 1, 1.0);
+    virtual_network->add_Arrow(0, 2, 1.0);
+    virtual_network->add_Arrow(1, 2, 1.0);
+
+    virtual_network->to_Screen();    
+*/
+    sInt_32 depth = 10;
+    sDouble geographical_distance = 15.0;
+
+    sPathEmbeddingModel::GeoCircles_vector geo_Circles;
+    
+    printf("Building model ...\n");
+    path_embedding_Model.setup_LimitedLazyGraphModel(&encoder, depth, geographical_distance);
+    //path_embedding_Model.to_Screen();
+
+    path_embedding_Model.build_LimitedLazyGraphModel(&encoder, solver, depth, &geo_Circles);
+    printf("Building model ... finished\n");
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
+
+    if (path_embedding_Model.solveAll_LazyGraphModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
     {
 	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
 	printf("Finally a correct embedding has been found !\n");		
@@ -952,6 +1220,7 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
         return result;
     } 
 */
+
 /*
     if (sFAILED(result = waxman_test_5()))
     {
@@ -959,6 +1228,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
+    
+    if (sFAILED(result = waxman_test_5_geo_circ()))
+    {
+	printf("Test waxman 5 failed (error:%d).\n", result);
+	return result;
+    }    
+
 /*
     if (sFAILED(result = waxman_test_5_tree()))
     {
@@ -966,13 +1242,27 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
-
+/*
+    if (sFAILED(result = waxman_test_5_tree_geo_circ()))
+    {
+	printf("Test waxman 5 failed (error:%d).\n", result);
+	return result;
+    }
+*/    
+/*
     if (sFAILED(result = waxman_test_5_graph()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }    
-
+*/
+/*
+    if (sFAILED(result = waxman_test_5_graph_geo_circ()))
+    {
+	printf("Test waxman 5 failed (error:%d).\n", result);
+	return result;
+    }
+*/
 /*
     if (sFAILED(result = waxman_test_6()))
     {

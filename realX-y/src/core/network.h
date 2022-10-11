@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-087_nofutu                             */
+/*                             realX 0-088_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-087_nofutu                                                   */
+/* network.h / 0-088_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -104,6 +104,9 @@ namespace realX
 	typedef std::vector<sInt_32> Mapping_vector;
 	typedef std::vector<Mapping_vector> Mappings_vector;
 
+	typedef std::vector<sInt_32> GeoCircle_vector;
+	typedef std::vector<GeoCircle_vector> GeoCircles_vector;
+
     public:
 	Glucose::Solver* setup_SATSolver(sDouble timeout = -1.0);
 	void destroy_SATSolver(Glucose::Solver *solver);
@@ -121,9 +124,9 @@ namespace realX
 	void build_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver);
 	void build_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver);
 	
-	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth);
-	void build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth);
-	void build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth);		
+	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
+	void build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
+	void build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 	
 	void build_IndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
 	void build_IndividualTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
@@ -135,15 +138,19 @@ namespace realX
 	
 	void build_IndividualCorrespondence(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id);
 	void build_GeographicalConstraints(sBoolEncoder *encoder, Glucose::Solver *solver);
+	void collect_GeographicalConstraints(GeoCircles_vector *geo_Circles);
 	
         bool solve_LazyPathModel(Glucose::Solver *solver);
-	bool solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
+        bool solve_LazyPathModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
+	bool solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);	
 
         bool solve_LazyTreeModel(Glucose::Solver *solver);
-	bool solveAll_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
+        bool solve_LazyTreeModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
+	bool solveAll_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 
         bool solve_LazyGraphModel(Glucose::Solver *solver);
-	bool solveAll_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);		
+        bool solve_LazyGraphModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
+	bool solveAll_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);		
 
 	void setup_PhysicalNetwork_online(const s_DirectedGraph &physical_Network);	
 	void setup_VirtualNetwork_online(const s_DirectedGraph &virtual_Network);
