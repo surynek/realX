@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-090_nofutu                             */
+/*                             realX 0-093_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.h / 0-090_nofutu                                               */
+/* waxman_test.h / 0-093_nofutu                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.

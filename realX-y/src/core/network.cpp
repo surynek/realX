@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-090_nofutu                             */
+/*                             realX 0-093_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-090_nofutu                                                 */
+/* network.cpp / 0-093_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -2775,6 +2775,7 @@ namespace realX
 			NetworkGraphMappings_vector graph_Embeddings;
 		
 			printf("Virtual network embedding found !\n");
+
 			decode_LimitedLazyGraphModel(solver, vertex_Embeddings, graph_Embeddings, depth);
 			transform_LimitedGraph2PathEmbeddings(vertex_Embeddings, graph_Embeddings, path_Embeddings, depth);
 
@@ -3535,19 +3536,18 @@ namespace realX
 			printf("\n");
 		    }
 */
-
-		    for (sInt_32 d = 0; d < depth; ++d)
+		    for (sInt_32 d = 1; d < depth; ++d)
 		    {
 			for (sInt_32 ed = 0; ed < graph_Embeddings[vn_id][i][neighbor_index][d].size(); ++ed)
-			{			
+			{
 			    if (vertex_Embeddings[vn_id][(*virt_neighbor)->m_target->m_id] == graph_Embeddings[vn_id][i][neighbor_index][d][ed])
-			    {
+			    {				
 				if (previous[d][ed] != -1)
 				{
 				    sInt_32 prev = ed;
 				    path_Embeddings[vn_id][i][neighbor_index][d] = graph_Embeddings[vn_id][i][neighbor_index][d][ed];
-				    
 				    sInt_32 dd = d;
+
 				    while (dd > 0)
 				    {
 					prev = previous[dd][prev];
@@ -3574,7 +3574,6 @@ namespace realX
 		    }
 		    printf("\n");
 */
-		    
 		    ++neighbor_index;		    
 		}
 	    }
