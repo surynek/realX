@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-087_nofutu                             */
+/*                             realX 0-093_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.cpp / 0-087_nofutu                                                     */
+/* cnf.cpp / 0-093_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -1027,7 +1027,33 @@ namespace realX
 	    ++Lits;
 	}
 	solver->addClause(glu_Lits);	
-    }    
+    }
+
+
+    void sBoolEncoder::build_PositiveAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits)
+    {
+	for (std::vector<sInt_32>::const_iterator var = var_IDs.begin(); var != var_IDs.end(); ++var)
+	{
+//	    printf("%d ", *lit);
+	    sInt_32 glu_var = sABS(*var) - 1;
+	    sASSERT(glu_var < solver->nVars());
+	    
+	    glu_Lits.push(Glucose::mkLit(glu_var, false));
+	}
+    }
+
+    
+    void sBoolEncoder::build_NegativeAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits)
+    {
+	for (std::vector<sInt_32>::const_iterator var = var_IDs.begin(); var != var_IDs.end(); ++var)
+	{
+//	    printf("%d ", *lit);
+	    sInt_32 glu_var = sABS(*var) - 1;
+	    sASSERT(glu_var < solver->nVars());
+	    
+	    glu_Lits.push(~Glucose::mkLit(glu_var, false));
+	}
+    }
 
     
 /*----------------------------------------------------------------------------*/

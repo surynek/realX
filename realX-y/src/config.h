@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-087_nofutu                             */
+/*                             realX 0-093_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* config.h / 0-087_nofutu                                                    */
+/* config.h / 0-093_nofutu                                                    */
 /*----------------------------------------------------------------------------*/
 //
 // Configuration file for auRIx package - global settings.

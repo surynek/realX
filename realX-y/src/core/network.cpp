@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-087_nofutu                             */
+/*                             realX 0-093_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-087_nofutu                                                 */
+/* network.cpp / 0-093_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -659,10 +659,11 @@ namespace realX
 	{
 	    build_GeographicalConstraints(encoder, solver);
 	}
+       
     }
 
 
-    void sPathEmbeddingModel::build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth)
+    void sPathEmbeddingModel::build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles)
     {
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
@@ -770,9 +771,16 @@ namespace realX
 	    }
 	}
 	*/
-	if (m_geographical_distance >= 0.0)
+	if (geo_Circles != NULL)
 	{
-	    build_GeographicalConstraints(encoder, solver);
+	    collect_GeographicalConstraints(geo_Circles);	    
+	}
+	else
+	{	
+	    if (m_geographical_distance >= 0.0)
+	    {
+		build_GeographicalConstraints(encoder, solver);
+	    }
 	}
     }
 
@@ -889,7 +897,7 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth)
+    void sPathEmbeddingModel::build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles)
     {
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
@@ -996,9 +1004,16 @@ namespace realX
 	    }
 	}
 	*/
-	if (m_geographical_distance >= 0.0)
+	if (geo_Circles != NULL)
 	{
-	    build_GeographicalConstraints(encoder, solver);
+	    collect_GeographicalConstraints(geo_Circles);	    
+	}
+	else
+	{		
+	    if (m_geographical_distance >= 0.0)
+	    {
+		build_GeographicalConstraints(encoder, solver);
+	    }
 	}
     }    
 
@@ -1115,7 +1130,7 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth)
+    void sPathEmbeddingModel::build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles)
     {
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
@@ -1222,9 +1237,16 @@ namespace realX
 	    }
 	}
 	*/
-	if (m_geographical_distance >= 0.0)
+	if (geo_Circles != NULL)
 	{
-	    build_GeographicalConstraints(encoder, solver);
+	    collect_GeographicalConstraints(geo_Circles);
+	}
+	else
+	{		
+	    if (m_geographical_distance >= 0.0)
+	    {
+		build_GeographicalConstraints(encoder, solver);
+	    }
 	}
     }
 
@@ -2273,6 +2295,45 @@ namespace realX
     }
 		
 
+    void sPathEmbeddingModel::collect_GeographicalConstraints(GeoCircles_vector *geo_Circles)
+    {
+	for (sDouble circ_radius = 1; circ_radius <= m_geographical_distance; ++circ_radius)
+	{
+	    geo_Circles->push_back(GeoCircle_vector());
+	    GeoCircle_vector &geo_Circle = geo_Circles->back();
+	    
+	    for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	    {
+		for (sInt_32 virt_u_id = 0; virt_u_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_u_id)
+		{
+		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
+		    {
+			if (!m_physical_Network.m_waxman_Nodes.empty() && !m_virtual_Networks[vn_id].m_waxman_Nodes.empty())
+			{
+			    sDouble x1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_x;
+			    sDouble y1 = m_physical_Network.m_waxman_Nodes[phys_u_id].m_y;
+			    
+			    sDouble x2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_x;
+			    sDouble y2 = m_virtual_Networks[vn_id].m_waxman_Nodes[virt_u_id].m_y;
+			    
+			    sDouble dx = x2 - x1;
+			    sDouble dy = y2 - y1;
+			    
+			    sDouble distance = sqrt(dx * dx + dy * dy);
+		    
+			    if (distance > m_geographical_distance)
+			    {
+				sInt_32 vertex_u_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);
+				geo_Circle.push_back(vertex_u_mapping_ID);
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+    
+    
     bool sPathEmbeddingModel::solve_LazyPathModel(Glucose::Solver *solver)
     {
 	if (!solver->simplify())
@@ -2317,35 +2378,123 @@ namespace realX
     }
 
 
-    bool sPathEmbeddingModel::solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth)
+    bool sPathEmbeddingModel::solve_LazyPathModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption)
     {
-	while (true)
+	if (!solver->simplify())
 	{
-	    printf("Resolving ...\n");
-	    
-	    if (solve_LazyPathModel(solver))
+  	    #ifdef sSTATISTICS
 	    {
-		vertex_Embeddings.clear();
-		path_Embeddings.clear();
-		
-		printf("Virtual network embedding found !\n");	    	    
-		decode_LimitedLazyPathModel(solver, vertex_Embeddings, path_Embeddings, depth);
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return false;
+	}
+	Glucose::lbool result = solver->solveLimited(geo_circ_Assumption);
 
-		if (refine_LimitedLazyPathModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return true;
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	
+	return true;		
+    }
+
+
+    bool sPathEmbeddingModel::solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles)
+    {
+	if (geo_Circles != NULL)
+	{
+	    sDouble geo_distance = 1.0;
+	    
+	    for (GeoCircles_vector::const_iterator geo_Circle = geo_Circles->begin(); geo_Circle != geo_Circles->end(); ++geo_Circle)
+	    {
+		printf("Solving at geographical distance = %.3f\n", geo_distance);
+		
+		while (true)
 		{
-		    printf("Model has been refined ...\n");		
+		    printf("Resolving ...\n");
+
+		    Glucose::vec<Glucose::Lit> geo_circ_Assumption;
+		    encoder->build_NegativeAssumption(solver, *geo_Circle, geo_circ_Assumption);
+		    
+		    if (solve_LazyPathModel(solver, geo_circ_Assumption))
+		    {
+			vertex_Embeddings.clear();
+			path_Embeddings.clear();
+		
+			printf("Virtual network embedding found !\n");	    	    
+			decode_LimitedLazyPathModel(solver, vertex_Embeddings, path_Embeddings, depth);
+
+			if (refine_LimitedLazyPathModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+			{
+			    printf("Model has been refined ...\n");		
+			}
+			else
+			{
+			    return true;
+			}
+		    }
+		    else
+		    {
+			break;
+		    }
+		}
+		++geo_distance;
+	    }
+	    return false;	    
+	}
+	else
+	{
+	    while (true)
+	    {
+		printf("Resolving ...\n");
+	    
+		if (solve_LazyPathModel(solver))
+		{
+		    vertex_Embeddings.clear();
+		    path_Embeddings.clear();
+		
+		    printf("Virtual network embedding found !\n");	    	    
+		    decode_LimitedLazyPathModel(solver, vertex_Embeddings, path_Embeddings, depth);
+
+		    if (refine_LimitedLazyPathModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+		    {
+			printf("Model has been refined ...\n");		
+		    }
+		    else
+		    {
+			return true;
+		    }
 		}
 		else
 		{
-		    return true;
+		    return false;
 		}
 	    }
-	    else
-	    {
-		return false;
-	    }
+	    return false;
 	}
-	return false;
     }
 
 
@@ -2393,35 +2542,123 @@ namespace realX
     }
 
 
-    bool sPathEmbeddingModel::solveAll_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth)
+    bool sPathEmbeddingModel::solve_LazyTreeModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption)
     {
-	while (true)
+	if (!solver->simplify())
 	{
-	    printf("Resolving ...\n");
-	    
-	    if (solve_LazyTreeModel(solver))
+  	    #ifdef sSTATISTICS
 	    {
-		vertex_Embeddings.clear();
-		path_Embeddings.clear();
-		
-		printf("Virtual network embedding found !\n");	    	    
-		decode_LimitedLazyTreeModel(solver, vertex_Embeddings, path_Embeddings, depth);
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return false;
+	}
+	Glucose::lbool result = solver->solveLimited(geo_circ_Assumption);
 
-		if (refine_LimitedLazyTreeModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return true;
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	
+	return true;	
+    }
+    
+
+    bool sPathEmbeddingModel::solveAll_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles)
+    {
+	if (geo_Circles != NULL)
+	{
+	    sDouble geo_distance = 1.0;
+	    
+	    for (GeoCircles_vector::const_iterator geo_Circle = geo_Circles->begin(); geo_Circle != geo_Circles->end(); ++geo_Circle)
+	    {
+		printf("Solving at geographical distance = %.3f\n", geo_distance);
+	
+		while (true)
 		{
-		    printf("Model has been refined ...\n");		
+		    printf("Resolving ...\n");
+
+		    Glucose::vec<Glucose::Lit> geo_circ_Assumption;
+		    encoder->build_NegativeAssumption(solver, *geo_Circle, geo_circ_Assumption);
+		    
+		    if (solve_LazyTreeModel(solver, geo_circ_Assumption))
+		    {
+			vertex_Embeddings.clear();
+			path_Embeddings.clear();
+			
+			printf("Virtual network embedding found !\n");	    	    
+			decode_LimitedLazyTreeModel(solver, vertex_Embeddings, path_Embeddings, depth);
+			
+			if (refine_LimitedLazyTreeModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+			{
+			    printf("Model has been refined ...\n");		
+			}
+			else
+			{
+			    return true;
+			}
+		    }
+		    else
+		    {
+			break;
+		    }
+		}
+		++geo_distance;
+	    }
+	    return false;
+	}
+	else
+	{
+	    while (true)
+	    {
+		printf("Resolving ...\n");
+
+		if (solve_LazyTreeModel(solver))
+		{
+		    vertex_Embeddings.clear();
+		    path_Embeddings.clear();
+		    
+		    printf("Virtual network embedding found !\n");	    	    
+		    decode_LimitedLazyTreeModel(solver, vertex_Embeddings, path_Embeddings, depth);
+		    
+		    if (refine_LimitedLazyTreeModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+		    {
+			printf("Model has been refined ...\n");		
+		    }
+		    else
+		    {
+			return true;
+		    }
 		}
 		else
 		{
-		    return true;
-		}
+		    return false;
+		}	    
 	    }
-	    else
-	    {
-		return false;
-	    }
+	    return false;
 	}
-	return false;
     }
 
 
@@ -2469,38 +2706,130 @@ namespace realX
     }
 
 
-    bool sPathEmbeddingModel::solveAll_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth)
+    bool sPathEmbeddingModel::solve_LazyGraphModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption)
     {
-	while (true)
+	if (!solver->simplify())
 	{
-	    printf("Resolving ...\n");
-	    
-	    if (solve_LazyGraphModel(solver))
+  	    #ifdef sSTATISTICS
 	    {
-		vertex_Embeddings.clear();
-		path_Embeddings.clear();
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return false;
+	}
+	Glucose::lbool result = solver->solveLimited(geo_circ_Assumption);
 
-		NetworkGraphMappings_vector graph_Embeddings;
-		
-		printf("Virtual network embedding found !\n");
-		decode_LimitedLazyGraphModel(solver, vertex_Embeddings, graph_Embeddings, depth);
-		transform_LimitedGraph2PathEmbeddings(vertex_Embeddings, graph_Embeddings, path_Embeddings, depth);
+	if (result == l_True)
+	{
+    	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_satisfiable_SAT_solver_Calls;
+	    }
+	    #endif
+	    return true;
+	}
+	else if (result == l_False)
+	{
+  	    #ifdef sSTATISTICS
+	    {
+		++s_GlobalStatistics.get_CurrentPhase().m_unsatisfiable_SAT_solver_Calls;
+	    }
+	    #endif	    	    
+	    return false;
+	}
+	else if (result == l_Undef)
+	{
+	    return false;
+	}
+	else
+	{
+	    sASSERT(false);
+	}
+	
+	return true;	
+    }
 
-		if (refine_LimitedLazyGraphModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+
+    bool sPathEmbeddingModel::solveAll_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles)
+    {
+	if (geo_Circles != NULL)
+	{
+	    sDouble geo_distance = 1.0;
+	    
+	    for (GeoCircles_vector::const_iterator geo_Circle = geo_Circles->begin(); geo_Circle != geo_Circles->end(); ++geo_Circle)
+	    {
+		printf("Solving at geographical distance = %.3f\n", geo_distance);
+
+		while (true)
 		{
-		    printf("Model has been refined ...\n");		
+		    printf("Resolving ...\n");
+
+		    Glucose::vec<Glucose::Lit> geo_circ_Assumption;
+		    encoder->build_NegativeAssumption(solver, *geo_Circle, geo_circ_Assumption);
+	    
+		    if (solve_LazyGraphModel(solver, geo_circ_Assumption))
+		    {
+			vertex_Embeddings.clear();
+			path_Embeddings.clear();
+			
+			NetworkGraphMappings_vector graph_Embeddings;
+		
+			printf("Virtual network embedding found !\n");
+
+			decode_LimitedLazyGraphModel(solver, vertex_Embeddings, graph_Embeddings, depth);
+			transform_LimitedGraph2PathEmbeddings(vertex_Embeddings, graph_Embeddings, path_Embeddings, depth);
+
+			if (refine_LimitedLazyGraphModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+			{
+			    printf("Model has been refined ...\n");		
+			}
+			else
+			{
+			    return true;
+			}
+		    }
+		    else
+		    {
+			break;
+		    }
+		}
+		++geo_distance;		
+	    }
+	    return false;
+	}	
+	else
+	{
+	    while (true)
+	    {
+		printf("Resolving ...\n");
+		
+		if (solve_LazyGraphModel(solver))
+		{
+		    vertex_Embeddings.clear();
+		    path_Embeddings.clear();
+		    
+		    NetworkGraphMappings_vector graph_Embeddings;
+		
+		    printf("Virtual network embedding found !\n");
+		    decode_LimitedLazyGraphModel(solver, vertex_Embeddings, graph_Embeddings, depth);
+		    transform_LimitedGraph2PathEmbeddings(vertex_Embeddings, graph_Embeddings, path_Embeddings, depth);
+
+		    if (refine_LimitedLazyGraphModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+		    {
+			printf("Model has been refined ...\n");		
+		    }
+		    else
+		    {
+			return true;
+		    }
 		}
 		else
 		{
-		    return true;
+		    return false;
 		}
 	    }
-	    else
-	    {
-		return false;
-	    }
+	    return false;
 	}
-	return false;
     }
     
     
@@ -3207,19 +3536,18 @@ namespace realX
 			printf("\n");
 		    }
 */
-
-		    for (sInt_32 d = 0; d < depth; ++d)
+		    for (sInt_32 d = 1; d < depth; ++d)
 		    {
 			for (sInt_32 ed = 0; ed < graph_Embeddings[vn_id][i][neighbor_index][d].size(); ++ed)
-			{			
+			{
 			    if (vertex_Embeddings[vn_id][(*virt_neighbor)->m_target->m_id] == graph_Embeddings[vn_id][i][neighbor_index][d][ed])
-			    {
+			    {				
 				if (previous[d][ed] != -1)
 				{
 				    sInt_32 prev = ed;
 				    path_Embeddings[vn_id][i][neighbor_index][d] = graph_Embeddings[vn_id][i][neighbor_index][d][ed];
-				    
 				    sInt_32 dd = d;
+
 				    while (dd > 0)
 				    {
 					prev = previous[dd][prev];
@@ -3246,7 +3574,6 @@ namespace realX
 		    }
 		    printf("\n");
 */
-		    
 		    ++neighbor_index;		    
 		}
 	    }
