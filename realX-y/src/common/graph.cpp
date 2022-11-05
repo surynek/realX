@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-057_nofutu                             */
+/*                             realX 0-094_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0-057_nofutu                                                   */
+/* graph.cpp / 0-094_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -3972,9 +3972,11 @@ namespace realX
 
 	m_Vertices.clear();
 	m_Arcs.clear();	
-	
-	add_Vertices(directed_graph.m_Vertices.size());
-	
+
+	for (Vertices_vector::const_iterator vertex = directed_graph.m_Vertices.begin(); vertex != directed_graph.m_Vertices.end(); ++vertex)
+	{
+	    add_Vertex(vertex->m_capacity);
+	}	
 	for (Arcs_list::const_iterator arc = directed_graph.m_Arcs.begin(); arc != directed_graph.m_Arcs.end(); ++arc)	
 	{
 	    add_Arrow(arc->m_source->m_id, arc->m_target->m_id, arc->m_capacity);
@@ -4256,7 +4258,7 @@ namespace realX
 	{
 	    for (s_Vertex::Neighbors_vector::const_iterator v_neighbor = m_Vertices[v_id].m_in_Neighbors.begin(); v_neighbor != m_Vertices[v_id].m_in_Neighbors.end(); ++v_neighbor)
 	    {
-		if ((*v_neighbor)->m_target->m_id == u_id)
+		if ((*v_neighbor)->m_source->m_id == u_id)
 		{
 		    return true;
 		}

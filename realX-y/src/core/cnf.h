@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-057_nofutu                             */
+/*                             realX 0-094_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* cnf.h / 0-057_nofutu                                                       */
+/* cnf.h / 0-094_nofutu                                                       */
 /*----------------------------------------------------------------------------*/
 //
 // Dimacs CNF formula production tools.
@@ -82,6 +82,10 @@ namespace realX
 	void cast_AllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);	
 	void cast_LinearAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);	
 	void cast_AdaptiveAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);
+	void cast_BinaryAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);
+	void cast_ProductAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);
+	void cast_CommandAllMutexConstraint(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);
+	
 	void cast_Disjunction(Glucose::Solver *solver, VariableIDs_vector &variable_IDs, sInt_32 weight = 0);		
 	void cast_Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 weight = 0);
 	void cast_3Mutex(Glucose::Solver *solver, sInt_32 variable_ID_A, sInt_32 variable_ID_B, sInt_32 variable_ID_C, sInt_32 weight = 0);
@@ -226,7 +230,10 @@ namespace realX
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3);
 	void cast_Clause(Glucose::Solver *solver, sInt_32 lit_1, sInt_32 lit_2, sInt_32 lit_3, sInt_32 lit_4);	
-	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);	
+	void cast_Clause(Glucose::Solver *solver, std::vector<sInt_32> &Lits);
+	void cast_Clause_(Glucose::Solver *solver, int *Lits);
+	void build_PositiveAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits);
+	void build_NegativeAssumption(Glucose::Solver *solver, const std::vector<sInt_32> &var_IDs, Glucose::vec<Glucose::Lit> &glu_Lits);
 
     public:
 	sInt_32 m_last_variable_ID;
