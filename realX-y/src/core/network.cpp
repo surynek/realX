@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-096_nofutu                             */
+/*                             realX 0-098_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-096_nofutu                                                 */
+/* network.cpp / 0-098_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -685,10 +685,10 @@ namespace realX
 			sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_u_id);
 			sBoolEncoder::VariableIDs_vector end_edge_mapping_IDs;
 
-			for (sInt_32 phys_index = 1; phys_index < m_physical_Network.get_VertexCount(); ++phys_index)
+			for (sInt_32 phys_index = 1; phys_index < depth; ++phys_index)
 			{
 //			    calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const			    
-				sInt_32 end_edge_mapping_ID = calc_EdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_index, phys_u_id);
+			    sInt_32 end_edge_mapping_ID = calc_EdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_index, phys_u_id);
 //			    sInt_32 end_edge_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_v_id);
 			    end_edge_mapping_IDs.push_back(end_edge_mapping_ID);
 			}
@@ -919,7 +919,7 @@ namespace realX
 			sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_u_id);
 			sBoolEncoder::VariableIDs_vector end_edge_mapping_IDs;
 
-			for (sInt_32 phys_index = 1; phys_index < m_physical_Network.get_VertexCount(); ++phys_index)
+			for (sInt_32 phys_index = 1; phys_index < depth; ++phys_index)			
 			{
 //			    calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const			    
 				sInt_32 end_edge_mapping_ID = calc_EdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_index, phys_u_id);
@@ -1152,7 +1152,7 @@ namespace realX
 			sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_u_id);
 			sBoolEncoder::VariableIDs_vector end_edge_mapping_IDs;
 
-			for (sInt_32 phys_index = 1; phys_index < m_physical_Network.get_VertexCount(); ++phys_index)
+			for (sInt_32 phys_index = 1; phys_index < depth; ++phys_index)
 			{
 //			    calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const			    
 				sInt_32 end_edge_mapping_ID = calc_EdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_index, phys_u_id);
