@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-107_nofutu                             */
-=======
-/*                             realX 0-104_nofutu                             */
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
+/*                             realX 0-106_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* waxman_test.cpp / 0-107_nofutu                                             */
-=======
-/* waxman_test.cpp / 0-104_nofutu                                             */
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
+/* waxman_test.cpp / 0-106_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -561,7 +553,7 @@ sResult waxman_test_5_geo_circ(void)
 
     virtual_network->to_Screen();    
 */
-    sInt_32 depth = 3;
+    sInt_32 depth = 10;
     sDouble geographical_distance = 15.0;
 
     sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
@@ -1307,17 +1299,12 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
-<<<<<<< HEAD
 /*
-=======
-
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
     if (sFAILED(result = waxman_test_5_geo_circ()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }    
-<<<<<<< HEAD
 */
 
     if (sFAILED(result = waxman_test_5_inc_geo_circ()))
@@ -1325,8 +1312,6 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }
-=======
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
 
 /*
     if (sFAILED(result = waxman_test_5_tree()))

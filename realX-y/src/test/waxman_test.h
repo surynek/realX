@@ -1,11 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-<<<<<<< HEAD
-/*                             realX 0-107_nofutu                             */
-=======
-/*                             realX 0-104_nofutu                             */
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
+/*                             realX 0-106_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -13,11 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-<<<<<<< HEAD
-/* waxman_test.h / 0-107_nofutu                                               */
-=======
-/* waxman_test.h / 0-104_nofutu                                               */
->>>>>>> 14f14b75c8f1d7815a0fb722e1fd0403f95fb68c
+/* waxman_test.h / 0-106_nofutu                                               */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
