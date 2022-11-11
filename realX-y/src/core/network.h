@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-098_nofutu                             */
+/*                             realX 0-106_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-098_nofutu                                                   */
+/* network.h / 0-106_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -142,7 +142,8 @@ namespace realX
 	
         bool solve_LazyPathModel(Glucose::Solver *solver);
         bool solve_LazyPathModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
-	bool solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);	
+	bool solveAll_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
+	sDouble solveDepthIncreasing_LazyPathModel(sBoolEncoder *encoder, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sDouble geographical_distance, sInt_32 max_depth, GeoCircles_vector *geo_Circles = NULL);
 
         bool solve_LazyTreeModel(Glucose::Solver *solver);
         bool solve_LazyTreeModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
@@ -180,6 +181,7 @@ namespace realX
 
 	sInt_32 calc_VertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 phys_v_id) const;
 	sInt_32 calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const;
+	sDouble calc_EmbeddingCost(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth) const;
 	
 	void decode_VertexEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &virt_v_id, sInt_32 &phys_v_id) const;
 	void decode_EdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &path_index) const;

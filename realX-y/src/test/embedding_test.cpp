@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-098_nofutu                             */
+/*                             realX 0-106_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* embedding_test.cpp / 0-098_nofutu                                          */
+/* embedding_test.cpp / 0-106_nofutu                                          */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding test.
@@ -496,6 +496,82 @@ sResult embedding_test_5(void)
 }    
 
 
+sResult embedding_test_6(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+    Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
+	
+    path_embedding_Model.m_physical_Network.add_Vertex(1.0);
+    path_embedding_Model.m_physical_Network.add_Vertex(1.0);
+    path_embedding_Model.m_physical_Network.add_Vertex(1.0);
+
+    path_embedding_Model.m_physical_Network.add_Arrow(0, 1, 2.0);
+    path_embedding_Model.m_physical_Network.add_Arrow(1, 2, 2.0);
+    path_embedding_Model.m_physical_Network.add_Arrow(2, 0, 2.0);
+
+    path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+
+    virtual_network->add_Arrow(0, 1, 3.0);
+    virtual_network->add_Arrow(1, 2, 3.0);
+    virtual_network->add_Arrow(2, 0, 3.0);
+
+    virtual_network->to_Screen();
+/*
+    embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+    virtual_network->add_Vertex(1.0);
+
+    virtual_network->add_Arrow(0, 1, 1.0);
+    virtual_network->add_Arrow(0, 2, 1.0);
+    virtual_network->add_Arrow(1, 2, 1.0);
+
+    virtual_network->to_Screen();    
+*/
+    sInt_32 depth = 3;
+//    sDouble geographical_distance = 35.0;
+    
+    path_embedding_Model.setup_LazyPathModel(&encoder);
+    path_embedding_Model.to_Screen();
+
+    path_embedding_Model.build_LazyPathModel(&encoder, solver);
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;    
+
+    if (path_embedding_Model.solveAll_LazyPathModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	printf("Finally a correct embedding has been found !\n");		
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");
+    }        
+
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+    
+    return sRESULT_SUCCESS;
+}    
+
+
 }  // namespace realX
 
 
@@ -536,9 +612,16 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     } 
     */
+    /*
     if (sFAILED(result = embedding_test_5()))
     {
 	printf("Test embedding 5 failed (error:%d).\n", result);
+	return result;
+    } 
+    */
+    if (sFAILED(result = embedding_test_6()))
+    {
+	printf("Test embedding 6 failed (error:%d).\n", result);
 	return result;
     }     
    
