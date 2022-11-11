@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-101_nofutu                             */
+/*                             realX 0-104_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-101_nofutu                                                 */
+/* network.cpp / 0-104_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -4354,6 +4354,62 @@ namespace realX
     }
 
 
+    sDouble sPathEmbeddingModel::calc_EmbeddingCost(sBoolEncoder *sUNUSED(encoder), Glucose::Solver *sUNUSED(solver), const Mappings_vector &sUNUSED(vertex_Embeddings), const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth) const
+    {
+	sDouble cost = 0.0;
+
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
+	    {
+		cost += m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_capacity;
+	    }	    
+	}	
+	
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    //m_virtual_Networks[vn_id].to_Screen();
+	    
+	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
+	    {
+		sInt_32 neigh_index = 0;
+
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    sInt_32 last_vertex_id = -1;
+		    for (sInt_32 path_index = 0; path_index < depth; ++path_index)
+//		    for (sInt_32 path_index = 0; path_index < m_virtual_Networks[vn_id].get_VertexCount(); ++path_index)
+		    {			
+			sDouble capacity = (*virt_neighbor)->m_capacity;
+			sInt_32 path_vertex_id = path_Embeddings[vn_id][virt_v_id][neigh_index][path_index];
+
+			if (last_vertex_id >= 0 && path_vertex_id >= 0)
+			{
+			    sInt_32 phys_neighbor_index = -1, phys_neigh_index = 0;
+			    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[last_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
+			    {
+				if ((*phys_neighbor)->m_target->m_id == path_vertex_id)
+				{
+				    phys_neighbor_index = phys_neigh_index;
+				    break;
+				}
+				++phys_neigh_index;
+			    }			    
+			    sASSERT(phys_neighbor_index != -1);
+
+			    cost += capacity;
+			}
+			last_vertex_id = path_vertex_id;
+		    }
+		    ++neigh_index;
+		}
+	    }
+	}
+	
+	return cost;	
+    }
+
+    
     void sPathEmbeddingModel::decode_VertexEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &virt_v_id, sInt_32 &phys_v_id) const
     {
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)

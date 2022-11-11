@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-101_nofutu                             */
+/*                             realX 0-104_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-101_nofutu                                             */
+/* waxman_test.cpp / 0-104_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -482,7 +482,10 @@ sResult waxman_test_5(void)
 
     if (path_embedding_Model.solveAll_LazyPathModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
@@ -513,7 +516,7 @@ sResult waxman_test_5_geo_circ(void)
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(34, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*
@@ -550,7 +553,7 @@ sResult waxman_test_5_geo_circ(void)
 
     virtual_network->to_Screen();    
 */
-    sInt_32 depth = 4;
+    sInt_32 depth = 3;
     sDouble geographical_distance = 15.0;
 
     sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
@@ -567,7 +570,10 @@ sResult waxman_test_5_geo_circ(void)
 
     if (path_embedding_Model.solveAll_LazyPathModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
@@ -653,7 +659,10 @@ sResult waxman_test_5_tree(void)
 
     if (path_embedding_Model.solveAll_LazyTreeModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
@@ -742,7 +751,10 @@ sResult waxman_test_5_tree_geo_circ(void)
 
     if (path_embedding_Model.solveAll_LazyTreeModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
@@ -823,7 +835,10 @@ sResult waxman_test_5_graph(void)
 
     if (path_embedding_Model.solveAll_LazyGraphModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
@@ -910,7 +925,10 @@ sResult waxman_test_5_graph_geo_circ(void)
 
     if (path_embedding_Model.solveAll_LazyGraphModel(&encoder, solver, vertex_Embeddings, path_Embeddings, depth, &geo_Circles))
     {
-	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);	
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
     }
     else
