@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-098_nofutu                             */
+/*                             realX 0-101_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-098_nofutu                                                 */
+/* network.cpp / 0-101_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -3781,6 +3781,7 @@ namespace realX
 		    {
 			sDouble capacity = (*virt_neighbor)->m_capacity;
 			sInt_32 path_vertex_id = path_Embeddings[vn_id][virt_v_id][neigh_index][path_index];
+			printf("%d ", path_vertex_id);
 
 			sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
 
@@ -3805,12 +3806,13 @@ namespace realX
 			last_vertex_id = path_vertex_id;
 			last_nogood_var = nogood_variable;
 		    }
+		    printf("\n");
 		    ++neigh_index;
 		}
 	    }
 	}
 
-	for (sInt_32 phys_v_id = 0; phys_v_id < depth; ++phys_v_id)
+	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sInt_32 phys_neigh_index = 0;
 	    printf("phys v: %d:  ", phys_v_id);
@@ -4062,7 +4064,7 @@ namespace realX
 	    }
 	}
 
-	for (sInt_32 phys_v_id = 0; phys_v_id < depth; ++phys_v_id)
+	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sInt_32 phys_neigh_index = 0;
 	    printf("phys v: %d:  ", phys_v_id);
@@ -4314,7 +4316,7 @@ namespace realX
 	    }
 	}
 
-	for (sInt_32 phys_v_id = 0; phys_v_id < depth; ++phys_v_id)
+	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sInt_32 phys_neigh_index = 0;
 	    printf("phys v: %d:  ", phys_v_id);

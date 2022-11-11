@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-098_nofutu                             */
+/*                             realX 0-101_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-098_nofutu                                             */
+/* waxman_test.cpp / 0-101_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -430,7 +430,7 @@ sResult waxman_test_5(void)
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(20, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(30, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*
@@ -513,7 +513,7 @@ sResult waxman_test_5_geo_circ(void)
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(34, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*
@@ -550,7 +550,7 @@ sResult waxman_test_5_geo_circ(void)
 
     virtual_network->to_Screen();    
 */
-    sInt_32 depth = 10;
+    sInt_32 depth = 4;
     sDouble geographical_distance = 15.0;
 
     sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
@@ -1227,13 +1227,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
-/*  
+
     if (sFAILED(result = waxman_test_5_geo_circ()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }    
-*/
+
 /*
     if (sFAILED(result = waxman_test_5_tree()))
     {
@@ -1248,13 +1248,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */    
-
+/*
     if (sFAILED(result = waxman_test_5_graph()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }    
-
+*/
 /*
     if (sFAILED(result = waxman_test_5_graph_geo_circ()))
     {
