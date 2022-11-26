@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-109_nofutu                             */
+/*                             realX 0-113_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-109_nofutu                                             */
+/* waxman_test.cpp / 0-113_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -822,6 +822,60 @@ sResult waxman_test_5_tree_geo_circ(void)
 }
 
 
+sResult waxman_test_5_tree_inc_geo_circ(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+	
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    //path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    sInt_32 max_depth = 10;
+    sDouble geographical_distance = 15.0;
+
+    sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;
+
+    sDouble cost;
+    cost = path_embedding_Model.solveDepthIncreasing_LazyTreeModel(&encoder,
+								   vertex_Embeddings,
+								   path_Embeddings,
+								   geographical_distance,
+								   max_depth,
+								   &geo_Circles);
+    
+    if (cost >= 0)
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	
+	printf("Cost: %.3f\n", cost);
+	printf("Finally a correct embedding has been found !\n");
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");	
+    }
+
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
 sResult waxman_test_5_graph(void)
 {
     clock_t time_start, time_finish;
@@ -989,6 +1043,60 @@ sResult waxman_test_5_graph_geo_circ(void)
     {
 	printf("Embedding does NOT exist.\n");
     }    
+    time_finish = clock();
+    printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
+   
+    return sRESULT_SUCCESS;
+}
+
+
+sResult waxman_test_5_graph_inc_geo_circ(void)
+{
+    clock_t time_start, time_finish;
+
+    time_start = clock();
+    sPathEmbeddingModel path_embedding_Model;
+    
+    sBoolEncoder encoder;
+	
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    //path_embedding_Model.m_physical_Network.to_Screen();
+
+    s_DirectedGraph *virtual_network;
+    path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
+    virtual_network = &path_embedding_Model.m_virtual_Networks.back();
+
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->to_Screen();
+
+    sInt_32 max_depth = 10;
+    sDouble geographical_distance = 15.0;
+
+    sPathEmbeddingModel::GeoCircles_vector geo_Circles;    
+
+    sEmbeddingModel::Mappings_vector vertex_Embeddings;
+    sPathEmbeddingModel::NetworkPathMappings_vector path_Embeddings;
+
+    sDouble cost;
+    cost = path_embedding_Model.solveDepthIncreasing_LazyGraphModel(&encoder,
+								   vertex_Embeddings,
+								   path_Embeddings,
+								   geographical_distance,
+								   max_depth,
+								   &geo_Circles);
+    
+    if (cost >= 0)
+    {
+	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+	
+	printf("Cost: %.3f\n", cost);
+	printf("Finally a correct embedding has been found !\n");
+    }
+    else
+    {
+	printf("Embedding does NOT exist.\n");	
+    }
+
     time_finish = clock();
     printf("Total CPU time: %.3f (seconds)\n", (time_finish - time_start) / (sDouble)CLOCKS_PER_SEC);
    
@@ -1326,7 +1434,14 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }
-*/    
+*/
+/*
+    if (sFAILED(result = waxman_test_5_tree_inc_geo_circ()))
+    {
+	printf("Test waxman 5 failed (error:%d).\n", result);
+	return result;
+    }
+*/
 /*
     if (sFAILED(result = waxman_test_5_graph()))
     {
@@ -1341,6 +1456,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }
 */
+/*
+    if (sFAILED(result = waxman_test_5_graph_inc_geo_circ()))
+    {
+	printf("Test waxman 5 failed (error:%d).\n", result);
+	return result;
+    }
+*/    
 /*
     if (sFAILED(result = waxman_test_6()))
     {

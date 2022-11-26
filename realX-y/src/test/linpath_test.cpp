@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-109_nofutu                             */
+/*                             realX 0-113_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* linpath_test.cpp / 0-109_nofutu                                            */
+/* linpath_test.cpp / 0-113_nofutu                                            */
 /*----------------------------------------------------------------------------*/
 //
 // Path planning in presence of obstacles based on linear programming.

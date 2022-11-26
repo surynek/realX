@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-109_nofutu                             */
+/*                             realX 0-113_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-109_nofutu                                                 */
+/* network.cpp / 0-113_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -2524,7 +2524,7 @@ namespace realX
 	}
 	
 	return -1.0;
-    }    
+    }   
 
 
     bool sPathEmbeddingModel::solve_LazyTreeModel(Glucose::Solver *solver)
@@ -2689,6 +2689,34 @@ namespace realX
 	    return false;
 	}
     }
+
+
+    sDouble sPathEmbeddingModel::solveDepthIncreasing_LazyTreeModel(sBoolEncoder *encoder, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sDouble geographical_distance, sInt_32 max_depth, GeoCircles_vector *geo_Circles)
+    {
+	for (sInt_32 depth = 3; depth <= max_depth; ++depth)
+	{
+	    Glucose::Solver *solver = setup_SATSolver();
+		
+	    setup_LimitedLazyTreeModel(encoder, depth, geographical_distance);
+	    build_LimitedLazyTreeModel(encoder, solver, depth, geo_Circles);
+
+	    if (solveAll_LazyTreeModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth, geo_Circles))
+	    {
+		to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+		sDouble cost = calc_EmbeddingCost(encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+		return cost;
+	    }
+
+	    destroy_SATSolver(solver);
+	    
+	    geo_Circles->clear();
+	    m_vertex_mapping_Offsets.clear();
+	    m_edge_mapping_Offsets.clear();
+	}
+	
+	return -1.0;
+    }        
 
 
     bool sPathEmbeddingModel::solve_LazyGraphModel(Glucose::Solver *solver)
@@ -2860,6 +2888,34 @@ namespace realX
 	    return false;
 	}
     }
+
+
+    sDouble sPathEmbeddingModel::solveDepthIncreasing_LazyGraphModel(sBoolEncoder *encoder, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sDouble geographical_distance, sInt_32 max_depth, GeoCircles_vector *geo_Circles)
+    {
+	for (sInt_32 depth = 3; depth <= max_depth; ++depth)
+	{
+	    Glucose::Solver *solver = setup_SATSolver();
+		
+	    setup_LimitedLazyGraphModel(encoder, depth, geographical_distance);
+	    build_LimitedLazyGraphModel(encoder, solver, depth, geo_Circles);
+
+	    if (solveAll_LazyGraphModel(encoder, solver, vertex_Embeddings, path_Embeddings, depth, geo_Circles))
+	    {
+		to_Screen_embedding(vertex_Embeddings, path_Embeddings);
+		sDouble cost = calc_EmbeddingCost(encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+
+		return cost;
+	    }
+
+	    destroy_SATSolver(solver);
+	    
+	    geo_Circles->clear();
+	    m_vertex_mapping_Offsets.clear();
+	    m_edge_mapping_Offsets.clear();
+	}
+	
+	return -1.0;
+    }            
     
     
     void sPathEmbeddingModel::setup_PhysicalNetwork_online(const s_DirectedGraph &physical_Network)
