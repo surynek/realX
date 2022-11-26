@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-113_nofutu                             */
+/*                             realX 0-117_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* compile.h / 0-113_nofutu                                                   */
+/* compile.h / 0-117_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Compilation configuration file for realX package - debugging variant.
