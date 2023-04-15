@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-117_nofutu                             */
+/*                             realX 0-120_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 0-117_nofutu                                                     */
+/* graph.h / 0-120_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -124,6 +124,9 @@ namespace realX
 	
 	Neighbors_vector m_in_Neighbors;
 	Neighbors_vector m_out_Neighbors;
+
+	bool m_visited;
+	sInt_32 m_prev_id;	
     };    
 
 

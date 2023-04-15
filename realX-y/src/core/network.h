@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-117_nofutu                             */
+/*                             realX 0-120_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-117_nofutu                                                   */
+/* network.h / 0-120_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -100,6 +100,11 @@ namespace realX
 	typedef std::vector<GraphMapping_vector> NeighborGraphMappings_vector;
 	typedef std::vector<NeighborGraphMappings_vector> VertexGraphMappings_vector;
 	typedef std::vector<VertexGraphMappings_vector> NetworkGraphMappings_vector;		
+
+	typedef std::set<sInt_32> FlatMapping_set;	
+	typedef std::vector<FlatMapping_set> NeighborFlatMappings_vector;	
+	typedef std::vector<NeighborFlatMappings_vector> VertexFlatMappings_vector;
+	typedef std::vector<VertexFlatMappings_vector> NetworkFlatMappings_vector;
 	
 	typedef std::vector<sInt_32> Mapping_vector;
 	typedef std::vector<Mapping_vector> Mappings_vector;
@@ -118,23 +123,28 @@ namespace realX
 	void setup_LimitedLazyTreeModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance = -1);
 
 	void setup_LazyGraphModel(sBoolEncoder *encoder, sDouble geographical_distance = -1);
-	void setup_LimitedLazyGraphModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance = -1);			
+	void setup_LimitedLazyGraphModel(sBoolEncoder *encoder, sInt_32 depth, sDouble geographical_distance = -1);
+
+	void setup_LazyFlatModel(sBoolEncoder *encoder, sDouble geographical_distance = -1);
 	
 	void build_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver);
 	void build_LazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver);
-	void build_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver);
+	void build_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver);	
+	void build_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver);
 	
 	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 	void build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 	void build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
+	void build_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, GeoCircles_vector *geo_Circles = NULL);		
 	
 	void build_IndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
 	void build_IndividualTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
-	void build_IndividualGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);	
+	void build_IndividualGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
+	void build_IndividualFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);		
 	
 	void build_LimitedIndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 depth);
 	void build_LimitedIndividualTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 depth);
-	void build_LimitedIndividualGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 depth);		
+	void build_LimitedIndividualGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 depth);
 	
 	void build_IndividualCorrespondence(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id);
 	void build_GeographicalConstraints(sBoolEncoder *encoder, Glucose::Solver *solver);
@@ -153,7 +163,11 @@ namespace realX
         bool solve_LazyGraphModel(Glucose::Solver *solver);
         bool solve_LazyGraphModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
 	bool solveAll_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
-	sDouble solveDepthIncreasing_LazyGraphModel(sBoolEncoder *encoder, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sDouble geographical_distance, sInt_32 max_depth, GeoCircles_vector *geo_Circles = NULL);	
+	sDouble solveDepthIncreasing_LazyGraphModel(sBoolEncoder *encoder, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, sDouble geographical_distance, sInt_32 max_depth, GeoCircles_vector *geo_Circles = NULL);
+
+        bool solve_LazyFlatModel(Glucose::Solver *solver);
+        bool solve_LazyFlatModel(Glucose::Solver *solver, Glucose::vec<Glucose::Lit> &geo_circ_Assumption);
+	bool solveAll_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkPathMappings_vector &path_Embeddings, GeoCircles_vector *geo_Circles = NULL);	
 
 	void setup_PhysicalNetwork_online(const s_DirectedGraph &physical_Network);	
 	void setup_VirtualNetwork_online(const s_DirectedGraph &virtual_Network);
@@ -171,6 +185,10 @@ namespace realX
 	void decode_LazyGraphModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkGraphMappings_vector &graph_Embeddings);
 	void decode_LimitedLazyGraphModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkGraphMappings_vector &graph_Embeddings, sInt_32 depth);
 	void transform_LimitedGraph2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkGraphMappings_vector &graph_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
+
+	void decode_LazyFlatModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkFlatMappings_vector &flat_Embeddings);
+	void transform_Flat2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkFlatMappings_vector &flat_Embeddings, NetworkPathMappings_vector &path_Embeddings);
+	void expand_FlatPath(sInt_32 phys_u_id, sInt_32 phys_v_id, const FlatMapping_set &flat_Path, PathMapping_vector &path);
 	
 	bool refine_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
 	bool refine_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
@@ -179,15 +197,24 @@ namespace realX
 	bool refine_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
 
 	bool refine_LazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
-	bool refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);		
+	bool refine_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
+
+	bool refine_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);		
 
 	sInt_32 calc_VertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 phys_v_id) const;
 	sInt_32 calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const;
+
+	sInt_32 calc_FlatVertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 phys_v_id) const;
+	sInt_32 calc_FlatEdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id) const;	
+	
 	sDouble calc_EmbeddingCost(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth) const;
 	
 	void decode_VertexEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &virt_v_id, sInt_32 &phys_v_id) const;
 	void decode_EdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &path_index) const;
-	void decode_LimitedEdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &path_index, sInt_32 depth) const;	
+	void decode_LimitedEdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &path_index, sInt_32 depth) const;
+
+	void decode_FlatVertexEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &virt_v_id, sInt_32 &phys_v_id) const;
+	void decode_FlatEdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id) const;
 
     public:
 	virtual void to_Screen(const sString &indent = "") const;
