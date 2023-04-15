@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-120_nofutu                             */
+/*                             realX 0-122_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-120_nofutu                                                   */
+/* network.h / 0-122_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -86,10 +86,12 @@ namespace realX
 	
 	typedef std::vector<sInt_32> Offsets_vector;
 	typedef std::vector<Offsets_vector> Offsets_2vector;
-	typedef std::vector<Offsets_2vector> Offsets_3vector;	
+	typedef std::vector<Offsets_2vector> Offsets_3vector;
+	typedef std::vector<Offsets_3vector> Offsets_4vector;		
 	
 	typedef Offsets_vector VertexOffsets_vector;
-	typedef Offsets_3vector EdgeOffsets_vector;	
+	typedef Offsets_3vector EdgeOffsets_vector;
+	typedef Offsets_4vector EdgeNeighborOffsets_vector;		
 
 	typedef std::vector<sInt_32> PathMapping_vector;
 	typedef std::vector<PathMapping_vector> NeighborPathMappings_vector;
@@ -99,12 +101,18 @@ namespace realX
 	typedef std::vector<std::vector<sInt_32> > GraphMapping_vector;
 	typedef std::vector<GraphMapping_vector> NeighborGraphMappings_vector;
 	typedef std::vector<NeighborGraphMappings_vector> VertexGraphMappings_vector;
-	typedef std::vector<VertexGraphMappings_vector> NetworkGraphMappings_vector;		
+	typedef std::vector<VertexGraphMappings_vector> NetworkGraphMappings_vector;
 
 	typedef std::set<sInt_32> FlatMapping_set;	
 	typedef std::vector<FlatMapping_set> NeighborFlatMappings_vector;	
 	typedef std::vector<NeighborFlatMappings_vector> VertexFlatMappings_vector;
 	typedef std::vector<VertexFlatMappings_vector> NetworkFlatMappings_vector;
+
+	typedef std::set<sInt_32> EdgeFlatMapping_set;
+	typedef std::vector<EdgeFlatMapping_set> EdgePhysicalVertexMapping_vector;
+	typedef std::vector<EdgePhysicalVertexMapping_vector> EdgeNeighborFlatMappings_vector;	
+	typedef std::vector<EdgeNeighborFlatMappings_vector> EdgeVertexFlatMappings_vector;
+	typedef std::vector<EdgeVertexFlatMappings_vector> EdgeNetworkFlatMappings_vector;	
 	
 	typedef std::vector<sInt_32> Mapping_vector;
 	typedef std::vector<Mapping_vector> Mappings_vector;
@@ -186,9 +194,9 @@ namespace realX
 	void decode_LimitedLazyGraphModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkGraphMappings_vector &graph_Embeddings, sInt_32 depth);
 	void transform_LimitedGraph2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkGraphMappings_vector &graph_Embeddings, NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
 
-	void decode_LazyFlatModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkFlatMappings_vector &flat_Embeddings);
-	void transform_Flat2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkFlatMappings_vector &flat_Embeddings, NetworkPathMappings_vector &path_Embeddings);
-	void expand_FlatPath(sInt_32 phys_u_id, sInt_32 phys_v_id, const FlatMapping_set &flat_Path, PathMapping_vector &path);
+	void decode_LazyFlatModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkFlatMappings_vector &flat_Embeddings, EdgeNetworkFlatMappings_vector &flat_edge_Embeddings);
+	void transform_Flat2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkFlatMappings_vector &flat_Embeddings, const EdgeNetworkFlatMappings_vector &flat_edge_Embeddings, NetworkPathMappings_vector &path_Embeddings);
+	void expand_FlatPath(sInt_32 phys_u_id, sInt_32 phys_v_id, const FlatMapping_set &flat_Path, const EdgePhysicalVertexMapping_vector &flat_edge_Path, PathMapping_vector &path);
 	
 	bool refine_LazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings);	
 	bool refine_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth);
@@ -205,7 +213,8 @@ namespace realX
 	sInt_32 calc_EdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_u_id, sInt_32 phys_v_id) const;
 
 	sInt_32 calc_FlatVertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 phys_v_id) const;
-	sInt_32 calc_FlatEdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id) const;	
+	sInt_32 calc_FlatEdgeVertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id) const;
+	sInt_32 calc_FlatEdgeNeighborEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id, sInt_32 phys_neighbor_index) const;
 	
 	sDouble calc_EmbeddingCost(sBoolEncoder *encoder, Glucose::Solver *solver, const Mappings_vector &vertex_Embeddings, const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth) const;
 	
@@ -215,6 +224,7 @@ namespace realX
 
 	void decode_FlatVertexEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &virt_v_id, sInt_32 &phys_v_id) const;
 	void decode_FlatEdgeEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id) const;
+	void decode_FlatEdgeNeighborEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &phys_neighbor_index) const;	
 
     public:
 	virtual void to_Screen(const sString &indent = "") const;
@@ -228,8 +238,10 @@ namespace realX
 	
 	VertexOffsets_vector m_vertex_mapping_Offsets;
 	sInt_32 m_last_vertex_mapping_variable;
-	sInt_32 m_last_edge_mapping_variable;	
+	sInt_32 m_last_edge_mapping_variable;
+	sInt_32 m_last_edge_neighbor_mapping_variable;		
 	EdgeOffsets_vector m_edge_mapping_Offsets;
+	EdgeNeighborOffsets_vector m_edge_neighbor_mapping_Offsets;	
 
 	sDouble m_geographical_distance;
     };    

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-120_nofutu                             */
+/*                             realX 0-122_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.h / 0-120_nofutu                                                     */
+/* graph.h / 0-122_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -569,6 +569,7 @@ namespace realX
 	void add_Vertices(sInt_32 Vertex_cnt = 1);
 
 	sInt_32 get_VertexCount(void) const;
+	sInt_32 get_OutEdgeCount(void) const;
 	s_Vertex* get_Vertex(sInt_32 id);
 	const s_Vertex* get_Vertex(sInt_32 id) const;
 

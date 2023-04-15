@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-120_nofutu                             */
+/*                             realX 0-122_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-120_nofutu                                                 */
+/* network.cpp / 0-122_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -553,7 +553,8 @@ namespace realX
     void sPathEmbeddingModel::setup_LazyFlatModel(sBoolEncoder *encoder, sDouble geographical_distance)
     {
 	sInt_32 offset = 1;
-	
+
+	printf("iota 1\n");
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    m_vertex_mapping_Offsets.push_back(offset);
@@ -561,20 +562,51 @@ namespace realX
 	}
 	m_last_vertex_mapping_variable = offset;
 
+	sInt_32 physical_vertex_count = m_physical_Network.get_VertexCount();
+	//sInt_32 physical_edge_count = m_physical_Network.get_OutEdgeCount();
+
+	printf("iota 2\n");	
 	m_edge_mapping_Offsets.resize(m_virtual_Networks.size());
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
-	    m_edge_mapping_Offsets[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());
+	    m_edge_mapping_Offsets[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());	    
 	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
 	    {
 		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.end(); ++virt_neighbor)
 		{
 		    m_edge_mapping_Offsets[vn_id][virt_v_id].push_back(offset);
-		    offset += m_physical_Network.get_VertexCount();
+		    offset += physical_vertex_count;
 		}
 	    }
 	}
-	m_last_edge_mapping_variable = offset;
+
+	m_last_edge_mapping_variable = offset;	
+
+	printf("iota 3\n");	
+	m_edge_neighbor_mapping_Offsets.resize(m_virtual_Networks.size());	
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    m_edge_neighbor_mapping_Offsets[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());	    
+	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
+	    {
+		m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id].resize(m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.size());
+		sInt_32 neighbor_index = 0;
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    //m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neighbor_index].resize(m_physical_Network.get_VertexCount());
+		    
+		    for (sInt_32 phys_vertex_id = 0; phys_vertex_id < m_physical_Network.get_VertexCount(); ++phys_vertex_id)
+		    {		    
+			m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neighbor_index].push_back(offset);
+			offset += m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.size();
+		    }
+		    ++neighbor_index;
+		}
+	    }
+	}
+	printf("iota 4\n");	
+
+	m_last_edge_neighbor_mapping_variable = offset;
 	encoder->set_LastVariableID(offset);
 
 	m_geographical_distance = geographical_distance;
@@ -943,7 +975,7 @@ namespace realX
 		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		    {
 			sInt_32 vertex_u_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);		    
-			sInt_32 start_edge_mapping_ID = calc_FlatEdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
+			sInt_32 start_edge_mapping_ID = calc_FlatEdgeVertexEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
 			encoder->cast_Implication(solver, vertex_u_mapping_ID, start_edge_mapping_ID);
 		    }
 
@@ -951,7 +983,7 @@ namespace realX
 		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		    {
 			sInt_32 vertex_v_mapping_ID = calc_VertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_u_id);			
-			sInt_32 end_edge_mapping_ID = calc_FlatEdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
+			sInt_32 end_edge_mapping_ID = calc_FlatEdgeVertexEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
 			encoder->cast_Implication(solver, vertex_v_mapping_ID, end_edge_mapping_ID);
 		    }
 		    ++neighbor_index;
@@ -1407,7 +1439,7 @@ namespace realX
 		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		    {
 			sInt_32 vertex_u_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);		    
-			sInt_32 start_edge_mapping_ID = calc_FlatEdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
+			sInt_32 start_edge_mapping_ID = calc_FlatEdgeVertexEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
 			encoder->cast_Implication(solver, vertex_u_mapping_ID, start_edge_mapping_ID);
 		    }
 
@@ -1415,7 +1447,7 @@ namespace realX
 		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		    {
 			sInt_32 vertex_v_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_neighbor_id, phys_u_id);
-			sInt_32 end_edge_mapping_ID = calc_FlatEdgeEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
+			sInt_32 end_edge_mapping_ID = calc_FlatEdgeVertexEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
 			encoder->cast_Implication(solver, vertex_v_mapping_ID, end_edge_mapping_ID);
 		    }
 		    ++neighbor_index;
@@ -2512,18 +2544,24 @@ namespace realX
     void sPathEmbeddingModel::build_IndividualFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 sUNUSED(virt_v_id), sInt_32 neighbor_index)
     {
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
-	{		
+	{
 	    sBoolEncoder::VariableIDs_vector target_IDs;
-	    sInt_32 path_v_base_id = calc_FlatEdgeEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, 0);
+	    sInt_32 path_v_base_id = calc_FlatEdgeVertexEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, 0);
 	    sInt_32 path_v_id = path_v_base_id + phys_v_id;	    
-	    
+
+	    sInt_32 phys_neighbor_index = 0;
 	    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[phys_v_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[phys_v_id].m_out_Neighbors.end(); ++phys_neighbor)
 	    {
+		sInt_32 edge_variable_id = calc_FlatEdgeNeighborEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, phys_v_id, phys_neighbor_index);
+		
 		sInt_32 phys_neighbor_id = (*phys_neighbor)->m_target->m_id;
 		sInt_32 path_neighbor_id = path_v_base_id + phys_neighbor_id;
+
+		encoder->cast_Implication(solver, edge_variable_id, path_neighbor_id);
 		
-		target_IDs.push_back(path_neighbor_id);
-	    }	
+		target_IDs.push_back(edge_variable_id);
+		++phys_neighbor_index;
+	    }
 
 	    if (!target_IDs.empty())
 	    {
@@ -3323,11 +3361,14 @@ namespace realX
 			path_Embeddings.clear();
 			
 			NetworkFlatMappings_vector flat_Embeddings;
+			EdgeNetworkFlatMappings_vector flat_edge_Embeddings;
 		
 			printf("Virtual network embedding found !\n");
 
-			decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings);
-			transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, path_Embeddings);
+			printf("xi 1\n");
+			decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings);
+			printf("xi 2\n");			
+			transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings, path_Embeddings);
 
 			if (refine_LazyFlatModel(encoder, solver, vertex_Embeddings, path_Embeddings))
 			{
@@ -3359,10 +3400,13 @@ namespace realX
 		    path_Embeddings.clear();
 		    
 		    NetworkFlatMappings_vector flat_Embeddings;
+		    EdgeNetworkFlatMappings_vector flat_edge_Embeddings;		    
 		
 		    printf("Virtual network embedding found !\n");
-		    decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings);
-		    transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, path_Embeddings);
+		    printf("xi 3\n");		    
+		    decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings);
+		    printf("xi 4\n");		    
+		    transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings, path_Embeddings);
 
 		    if (refine_LazyFlatModel(encoder, solver, vertex_Embeddings, path_Embeddings))
 		    {
@@ -3738,23 +3782,29 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::decode_LazyFlatModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkFlatMappings_vector &flat_Embeddings)
+    void sPathEmbeddingModel::decode_LazyFlatModel(Glucose::Solver *solver, Mappings_vector &vertex_Embeddings, NetworkFlatMappings_vector &flat_Embeddings, EdgeNetworkFlatMappings_vector &flat_edge_Embeddings)    
     {
 	vertex_Embeddings.resize(m_virtual_Networks.size());
 	flat_Embeddings.resize(m_virtual_Networks.size());
+	flat_edge_Embeddings.resize(m_virtual_Networks.size());	
 	
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 	    flat_Embeddings[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());
+	    flat_edge_Embeddings[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());	    
 	    vertex_Embeddings[vn_id].resize(m_virtual_Networks[vn_id].get_VertexCount());
 
 	    for (sInt_32 i = 0; i < m_virtual_Networks[vn_id].get_VertexCount(); ++i)
 	    {
 		flat_Embeddings[vn_id][i].resize(m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.size());
+		flat_edge_Embeddings[vn_id][i].resize(m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.size());		
 
-		/*
-		flat_Embeddings[vn_id][i][neighbor_index];
-		*/
+		sInt_32 neighbor_index = 0;
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    flat_edge_Embeddings[vn_id][i][neighbor_index].resize(m_physical_Network.get_VertexCount());
+		    ++neighbor_index;
+		}
 	    }
 	}
 	
@@ -3808,6 +3858,35 @@ namespace realX
 		flat_Embeddings[vnet_id][u_id][neighbor_index].insert(phys_u_id);
 		printf("vnet_id: %d, u_id: %d, v_id:%d, phys_u_id:%d\n", vnet_id, u_id, v_id, phys_u_id);
 	    }
+	}
+	for (sInt_32 i = m_last_edge_mapping_variable - 1; i < m_last_edge_neighbor_mapping_variable - 1; i++)
+	{
+	    sInt_32 literal;
+		    
+	    if (solver->model[i] != l_Undef)
+	    {
+		literal = (solver->model[i] == l_True) ? i + 1 : -(i+1);
+	    }
+	    else
+	    {
+		sASSERT(false);
+	    }
+
+	    if (literal > 0)
+	    {
+		sInt_32 variable_ID = sABS(literal);
+	    
+		sInt_32 vnet_id;
+		sInt_32 u_id, v_id, neighbor_index;
+		sInt_32 phys_u_id = -1, phys_neighbor_index = -1;
+
+		decode_FlatEdgeNeighborEmbeddingMapping(variable_ID, vnet_id, u_id, v_id, neighbor_index, phys_u_id, phys_neighbor_index);
+		sASSERT(phys_u_id != -1 && phys_neighbor_index != -1);
+
+		printf("iota 1: %ld\n", flat_edge_Embeddings.size());
+		flat_edge_Embeddings[vnet_id][u_id][neighbor_index][phys_u_id].insert(phys_neighbor_index);
+		printf("iota 2\n");		
+	    }	    
 	}
     }    
 
@@ -4205,7 +4284,7 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::transform_Flat2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkFlatMappings_vector &flat_Embeddings, NetworkPathMappings_vector &path_Embeddings)
+    void sPathEmbeddingModel::transform_Flat2PathEmbeddings(const Mappings_vector &vertex_Embeddings, const NetworkFlatMappings_vector &flat_Embeddings, const EdgeNetworkFlatMappings_vector &flat_edge_Embeddings, NetworkPathMappings_vector &path_Embeddings)
     {
 	path_Embeddings.resize(m_virtual_Networks.size());
 	
@@ -4233,7 +4312,7 @@ namespace realX
 		    printf("phys 2 phys: %d -- %d\n", phys_u_id, phys_v_id);
 
 		    printf("expanding 1\n");
-		    expand_FlatPath(phys_u_id, phys_v_id, flat_Embeddings[vn_id][i][neighbor_index], path_Embeddings[vn_id][i][neighbor_index]);
+		    expand_FlatPath(phys_u_id, phys_v_id, flat_Embeddings[vn_id][i][neighbor_index], flat_edge_Embeddings[vn_id][i][neighbor_index], path_Embeddings[vn_id][i][neighbor_index]);
 		    printf("expanding 2\n");
 		    ++neighbor_index;		    
 		}
@@ -4242,8 +4321,10 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::expand_FlatPath(sInt_32 phys_u_id, sInt_32 phys_v_id, const FlatMapping_set &flat_Path, PathMapping_vector &path)    
+    void sPathEmbeddingModel::expand_FlatPath(sInt_32 phys_u_id, sInt_32 phys_v_id, const FlatMapping_set &flat_Path, const EdgePhysicalVertexMapping_vector &flat_edge_Path, PathMapping_vector &path)       
     {
+	sASSERT(!flat_Path.empty());
+	
 	for (sInt_32 phys_vertex_id = 0; phys_vertex_id < m_physical_Network.get_VertexCount(); ++phys_vertex_id)
 	{
 	    m_physical_Network.m_Vertices[phys_vertex_id].m_visited = false;
@@ -4252,7 +4333,29 @@ namespace realX
 	
 	std::list<sInt_32> queue;	
 	queue.push_back(phys_u_id);
-	m_physical_Network.m_Vertices[phys_u_id].m_visited = true;	
+	m_physical_Network.m_Vertices[phys_u_id].m_visited = true;
+
+	printf("Flat path:\n");
+	for (FlatMapping_set::const_iterator flat_vertex = flat_Path.begin(); flat_vertex != flat_Path.end(); ++flat_vertex)
+	{
+	    printf("%d ", *flat_vertex);
+	}
+	printf("\n");
+
+	printf("Flat edge path:\n");
+	for (sInt_32 k = 0; k < flat_edge_Path.size(); ++k)
+	{
+	    if (!flat_edge_Path[k].empty())
+	    {
+		printf("%d (", k);
+		for (FlatMapping_set::const_iterator flat_neighbor = flat_edge_Path[k].begin(); flat_neighbor != flat_edge_Path[k].end(); ++flat_neighbor)
+		{
+		    printf("%d ", m_physical_Network.m_Vertices[k].m_out_Neighbors[*flat_neighbor]->m_target->m_id);
+		}
+		printf(") ");
+	    }
+	}
+	printf("\n");
 
 	while (!queue.empty())
 	{
@@ -4272,20 +4375,33 @@ namespace realX
 		for (sInt_32 i = anti_path.size() - 1; i >= 0; --i)
 		{
 		    path.push_back(anti_path[i]);
-		}		
+		}
+
+		printf("Regular path:\n");
+		for (PathMapping_vector::const_iterator vertex = path.begin(); vertex != path.end(); ++vertex)
+		{
+		    printf("%d ", *vertex);
+		}
+		printf("\n");
+		getchar();
 		return;
-	    }	    
+	    }
+	    sInt_32 phys_neighbor_index = 0;
 	    for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
 	    {
 		sInt_32 target_id = (*phys_neighbor)->m_target->m_id;
 
-		if (flat_Path.find(target_id) != flat_Path.end())
+		if (flat_Path.find(target_id) != flat_Path.end() && flat_edge_Path[phys_vertex_id].find(phys_neighbor_index) != flat_edge_Path[phys_vertex_id].end())
 		{
-		    m_physical_Network.m_Vertices[target_id].m_visited = true;
-		    m_physical_Network.m_Vertices[target_id].m_prev_id = phys_vertex_id;
+		    if (!m_physical_Network.m_Vertices[target_id].m_visited)
+		    {
+			m_physical_Network.m_Vertices[target_id].m_visited = true;
+			m_physical_Network.m_Vertices[target_id].m_prev_id = phys_vertex_id;
 		    
-		    queue.push_back(target_id);
+			queue.push_back(target_id);
+		    }
 		}
+		++phys_neighbor_index;
 	    }
 	}
     }	   
@@ -5084,7 +5200,7 @@ namespace realX
 		
 		vertex_Saturations[virtual_Embeddings[vn_id][virt_v_id]] += m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_capacity;
 //		printf("  %d,%d,%d\n", vn_id, virt_v_id, virtual_Embeddings[vn_id][virt_v_id]);
-		vertex_Nogoods[virtual_Embeddings[vn_id][virt_v_id]].push_back(calc_VertexEmbeddingBitVariableID(vn_id, virt_v_id, virtual_Embeddings[vn_id][virt_v_id]));
+		vertex_Nogoods[virtual_Embeddings[vn_id][virt_v_id]].push_back(calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_v_id, virtual_Embeddings[vn_id][virt_v_id]));
 	    }	    
 	}	
 	
@@ -5106,6 +5222,7 @@ namespace realX
 	    }
 	}
 
+	/*
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
 //	    m_virtual_Networks[vn_id].to_Screen();    
@@ -5123,7 +5240,7 @@ namespace realX
 			sDouble capacity = (*virt_neighbor)->m_capacity;
 			sInt_32 path_vertex_id = path_Embeddings[vn_id][virt_v_id][neigh_index][path_index];
 
-			sInt_32 nogood_variable = calc_EdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
+			sInt_32 nogood_variable = calc_FlatEdgeEmbeddingBitVariableID(vn_id, virt_v_id, neigh_index, path_index, path_vertex_id);
 			
 			if (last_vertex_id >= 0 && path_vertex_id >= 0)
 			{			    
@@ -5151,6 +5268,7 @@ namespace realX
 		}
 	    }
 	}
+	*/
 
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
@@ -5198,14 +5316,19 @@ namespace realX
     }
 
     
-    sInt_32 sPathEmbeddingModel::calc_FlatEdgeEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id) const
+    sInt_32 sPathEmbeddingModel::calc_FlatEdgeVertexEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id) const
     {
 	sASSERT(!m_edge_mapping_Offsets.empty());
 
 	return (m_edge_mapping_Offsets[vnet_id][virt_u_id][neighbor_index] + phys_v_id);
     }
-    
 
+    
+    sInt_32 sPathEmbeddingModel::calc_FlatEdgeNeighborEmbeddingBitVariableID(sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 neighbor_index, sInt_32 phys_v_id, sInt_32 phys_neighbor_index) const
+    {
+	return (m_edge_neighbor_mapping_Offsets[vnet_id][virt_u_id][neighbor_index][phys_v_id] + phys_neighbor_index);	
+    }
+    
 
     sDouble sPathEmbeddingModel::calc_EmbeddingCost(sBoolEncoder *sUNUSED(encoder), Glucose::Solver *sUNUSED(solver), const Mappings_vector &sUNUSED(vertex_Embeddings), const sPathEmbeddingModel::NetworkPathMappings_vector &path_Embeddings, sInt_32 depth) const
     {
@@ -5373,7 +5496,7 @@ namespace realX
     {
 	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
 	{
-	    sInt_32 vnet_size = m_physical_Network.get_VertexCount() * m_physical_Network.get_VertexCount();
+	    sInt_32 vnet_size = m_physical_Network.get_VertexCount();
 	    
 	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
 	    {
@@ -5398,7 +5521,52 @@ namespace realX
 	    }
 	}
     }    
-    
+
+
+    void sPathEmbeddingModel::decode_FlatEdgeNeighborEmbeddingMapping(sInt_32 variable_ID, sInt_32 &vnet_id, sInt_32 &u_id, sInt_32 &v_id, sInt_32 &neighbor_index, sInt_32 &phys_u_id, sInt_32 &phys_neighbor_index) const
+    {
+	for (sInt_32 vn_id = 0; vn_id < m_virtual_Networks.size(); ++vn_id)
+	{
+	    for (sInt_32 virt_v_id = 0; virt_v_id < m_virtual_Networks[vn_id].get_VertexCount(); ++virt_v_id)
+	    {
+		sInt_32 neigh_index = 0;
+		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[virt_v_id].m_out_Neighbors.end(); ++virt_neighbor)
+		{
+		    for (sInt_32 phys_vertex_id = 0; phys_vertex_id < m_physical_Network.get_VertexCount(); ++phys_vertex_id)
+		    {		    
+			sInt_32 phys_neigh_index = 0;		    
+			//for (s_Vertex::Neighbors_vector::const_iterator phys_neighbor = m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.begin(); phys_neighbor != m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.end(); ++phys_neighbor)
+			//{
+			//printf("Range: %d, %d\n", m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neigh_index][phys_vertex_id], m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neigh_index][phys_vertex_id] + m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.size());
+			if (   variable_ID >= m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neigh_index][phys_vertex_id]
+			    && variable_ID < m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neigh_index][phys_vertex_id] + m_physical_Network.m_Vertices[phys_vertex_id].m_out_Neighbors.size())
+			{
+			    sInt_32 subindex = variable_ID - m_edge_neighbor_mapping_Offsets[vn_id][virt_v_id][neigh_index][phys_vertex_id];
+			    
+			    phys_neighbor_index = subindex;
+			    vnet_id = vn_id;
+			    u_id = virt_v_id;
+			    v_id = (*virt_neighbor)->m_target->m_id;
+			    neighbor_index = neigh_index;
+			    phys_u_id = phys_vertex_id;
+
+			    printf("Variable: %d\n", variable_ID);
+			    printf("phys_u_id: %d, vnet_id: %d, u_id: %d, v_id: %d, neighbor_index: %d, phys_neighbor_index: %d\n",
+				   phys_u_id,
+				   vnet_id,
+				   u_id,
+				   v_id,
+				   neighbor_index,
+				   phys_neighbor_index);
+			    return;
+			}
+			//++phys_neigh_index;
+		    }
+		    ++neigh_index;
+		}
+	    }
+	}	
+    }
     /*
 	for (sInt_32 i = 0; i < solver->nVars(); i++)
 	{

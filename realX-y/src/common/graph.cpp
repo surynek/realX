@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-120_nofutu                             */
+/*                             realX 0-122_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* graph.cpp / 0-120_nofutu                                                   */
+/* graph.cpp / 0-122_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Graph related data structures and algorithms.
@@ -4178,6 +4178,19 @@ namespace realX
     {
 	return m_Vertices.size();
     }
+
+
+    sInt_32 s_DirectedGraph::get_OutEdgeCount(void) const
+    {
+	sInt_32 out_edge_count = 0;
+
+	for (sInt_32 virt_v_id = 0; virt_v_id < get_VertexCount(); ++virt_v_id)
+	{
+	    out_edge_count += m_Vertices[virt_v_id].m_out_Neighbors.size();
+	}
+
+	return out_edge_count;
+    }    
 
 
     s_Vertex* s_DirectedGraph::get_Vertex(sInt_32 id)
