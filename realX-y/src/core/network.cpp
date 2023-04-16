@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-122_nofutu                             */
+/*                             realX 0-125_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.cpp / 0-122_nofutu                                                 */
+/* network.cpp / 0-125_nofutu                                                 */
 /*----------------------------------------------------------------------------*/
 //
 // Robot (model) related data structures and functions.
@@ -974,7 +974,7 @@ namespace realX
 		{
 		    for (sInt_32 phys_u_id = 0; phys_u_id < m_physical_Network.get_VertexCount(); ++phys_u_id)
 		    {
-			sInt_32 vertex_u_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);		    
+			sInt_32 vertex_u_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vn_id, virt_u_id, phys_u_id);
 			sInt_32 start_edge_mapping_ID = calc_FlatEdgeVertexEmbeddingBitVariableID(vn_id, virt_u_id, neighbor_index, phys_u_id);
 			encoder->cast_Implication(solver, vertex_u_mapping_ID, start_edge_mapping_ID);
 		    }
@@ -2541,11 +2541,13 @@ namespace realX
     }
 
 
-    void sPathEmbeddingModel::build_IndividualFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 sUNUSED(virt_v_id), sInt_32 neighbor_index)
+    void sPathEmbeddingModel::build_IndividualFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_u_id, sInt_32 virt_v_id, sInt_32 neighbor_index)
     {
 	for (sInt_32 phys_v_id = 0; phys_v_id < m_physical_Network.get_VertexCount(); ++phys_v_id)
 	{
 	    sBoolEncoder::VariableIDs_vector target_IDs;
+	    sInt_32 connector_vertex_v_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vnet_id, virt_v_id, phys_v_id);
+	    
 	    sInt_32 path_v_base_id = calc_FlatEdgeVertexEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, 0);
 	    sInt_32 path_v_id = path_v_base_id + phys_v_id;	    
 
@@ -2562,7 +2564,37 @@ namespace realX
 		target_IDs.push_back(edge_variable_id);
 		++phys_neighbor_index;
 	    }
+	    sBoolEncoder::VariableIDs_vector source_IDs;
 
+	    sInt_32 connector_vertex_u_mapping_ID = calc_FlatVertexEmbeddingBitVariableID(vnet_id, virt_u_id, phys_v_id);
+	    
+	    sInt_32 in_neighbor_index = 0;	    
+	    for (s_Vertex::Neighbors_vector::const_iterator in_neighbor = m_physical_Network.m_Vertices[phys_v_id].m_in_Neighbors.begin(); in_neighbor != m_physical_Network.m_Vertices[phys_v_id].m_in_Neighbors.end(); ++in_neighbor)
+	    {
+		sInt_32 in_neighbor_id = (*in_neighbor)->m_source->m_id;
+
+		sInt_32 inin_neighbor_index = 0;
+		for (s_Vertex::Neighbors_vector::const_iterator inin_neighbor = m_physical_Network.m_Vertices[in_neighbor_id].m_out_Neighbors.begin(); inin_neighbor != m_physical_Network.m_Vertices[in_neighbor_id].m_out_Neighbors.end(); ++inin_neighbor)
+		{
+		    sInt_32 inin_neighbor_id = (*inin_neighbor)->m_target->m_id;
+		    
+		    if (inin_neighbor_id == phys_v_id)
+		    {
+			sInt_32 source_edge_variable_id = calc_FlatEdgeNeighborEmbeddingBitVariableID(vnet_id, virt_u_id, neighbor_index, in_neighbor_id, inin_neighbor_index);
+			source_IDs.push_back(source_edge_variable_id);
+		    }
+		    ++inin_neighbor_index;
+		}
+		++in_neighbor_index;
+	    }
+
+	    source_IDs.push_back(connector_vertex_u_mapping_ID);
+	    target_IDs.push_back(connector_vertex_v_mapping_ID);
+	    
+	    if (!source_IDs.empty())
+	    {
+		encoder->cast_AdaptiveAllMutexConstraint(solver, source_IDs);
+	    }
 	    if (!target_IDs.empty())
 	    {
 		encoder->cast_MultiImplication(solver, path_v_id, target_IDs);
@@ -3369,6 +3401,7 @@ namespace realX
 			decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings);
 			printf("xi 2\n");			
 			transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings, path_Embeddings);
+			printf("xi 3\n");
 
 			if (refine_LazyFlatModel(encoder, solver, vertex_Embeddings, path_Embeddings))
 			{
@@ -3403,10 +3436,11 @@ namespace realX
 		    EdgeNetworkFlatMappings_vector flat_edge_Embeddings;		    
 		
 		    printf("Virtual network embedding found !\n");
-		    printf("xi 3\n");		    
-		    decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings);
 		    printf("xi 4\n");		    
+		    decode_LazyFlatModel(solver, vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings);
+		    printf("xi 5\n");		    
 		    transform_Flat2PathEmbeddings(vertex_Embeddings, flat_Embeddings, flat_edge_Embeddings, path_Embeddings);
+		    printf("xi 6\n");
 
 		    if (refine_LazyFlatModel(encoder, solver, vertex_Embeddings, path_Embeddings))
 		    {
@@ -4302,6 +4336,7 @@ namespace realX
 	{
 	    for (sInt_32 i = 0; i < m_virtual_Networks[vn_id].get_VertexCount(); ++i)
 	    {
+		printf("V node: %d\n", i);
 		sInt_32 neighbor_index = 0;
 
 		for (s_Vertex::Neighbors_vector::const_iterator virt_neighbor = m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.begin(); virt_neighbor != m_virtual_Networks[vn_id].m_Vertices[i].m_out_Neighbors.end(); ++virt_neighbor)

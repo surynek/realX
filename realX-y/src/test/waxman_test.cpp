@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-122_nofutu                             */
+/*                             realX 0-125_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-122_nofutu                                             */
+/* waxman_test.cpp / 0-125_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -1372,14 +1372,16 @@ sResult waxman_test_9_flat(void)
     sBoolEncoder encoder;
     Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
 	
-    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+//    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(80, 0.5, 0.5, 50, 50);
     //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+//    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);    
+    virtual_network->generate_DirectedWaxman(20, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*

@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-122_nofutu                             */
+/*                             realX 0-125_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* network.h / 0-122_nofutu                                                   */
+/* network.h / 0-125_nofutu                                                   */
 /*----------------------------------------------------------------------------*/
 //
 // Virtual network embedding model and Boolean encoding.
@@ -143,7 +143,7 @@ namespace realX
 	void build_LimitedLazyPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 	void build_LimitedLazyTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
 	void build_LimitedLazyGraphModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 depth, GeoCircles_vector *geo_Circles = NULL);
-	void build_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, GeoCircles_vector *geo_Circles = NULL);		
+	void build_LazyFlatModel(sBoolEncoder *encoder, Glucose::Solver *solver, GeoCircles_vector *geo_Circles);		
 	
 	void build_IndividualPathModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
 	void build_IndividualTreeModel(sBoolEncoder *encoder, Glucose::Solver *solver, sInt_32 vnet_id, sInt_32 virt_v_id, sInt_32 virt_u_id, sInt_32 neighbor_index);
