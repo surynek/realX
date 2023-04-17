@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-130_nofutu                             */
+/*                             realX 0-133_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-130_nofutu                                             */
+/* waxman_test.cpp / 0-133_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -430,7 +430,7 @@ sResult waxman_test_5(void)
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(30, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*
@@ -468,7 +468,7 @@ sResult waxman_test_5(void)
     virtual_network->to_Screen();    
 */
     sInt_32 depth = 10;
-    sDouble geographical_distance = 35.0;
+    sDouble geographical_distance = 15.0;
 
     printf("Building model ...\n");
     path_embedding_Model.setup_LimitedLazyPathModel(&encoder, depth, geographical_distance);
@@ -596,16 +596,18 @@ sResult waxman_test_5_inc_geo_circ(void)
     
     sBoolEncoder encoder;
 	
-//    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
-    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(30, 0.5, 0.5, 50, 50);    
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+//    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(30, 0.5, 0.5, 50, 50);    
     //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-//    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
-    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);    
+    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+//    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);
+
+    path_embedding_Model.m_physical_Network.to_Screen();    
     virtual_network->to_Screen();
 
     sInt_32 max_depth = 10;
