@@ -1,7 +1,7 @@
 /*============================================================================*/
 /*                                                                            */
 /*                                                                            */
-/*                             realX 0-127_nofutu                             */
+/*                             realX 0-130_nofutu                             */
 /*                                                                            */
 /*                  (C) Copyright 2021 - 2022 Pavel Surynek                   */
 /*                                                                            */
@@ -9,7 +9,7 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* waxman_test.cpp / 0-127_nofutu                                             */
+/* waxman_test.cpp / 0-130_nofutu                                             */
 /*----------------------------------------------------------------------------*/
 //
 // Waxman graph testing for virtual network embedding.
@@ -596,14 +596,16 @@ sResult waxman_test_5_inc_geo_circ(void)
     
     sBoolEncoder encoder;
 	
-    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+//    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(30, 0.5, 0.5, 50, 50);    
     //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
     path_embedding_Model.m_virtual_Networks.push_back(s_DirectedGraph());
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
-    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+//    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(16, 0.5, 0.5, 50, 50);    
     virtual_network->to_Screen();
 
     sInt_32 max_depth = 10;
@@ -1373,7 +1375,7 @@ sResult waxman_test_9_flat(void)
     Glucose::Solver *solver = path_embedding_Model.setup_SATSolver();
 	
 //    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(100, 0.5, 0.5, 50, 50);
-    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(80, 0.5, 0.5, 50, 50);
+    path_embedding_Model.m_physical_Network.generate_UndirectedWaxman(30, 0.5, 0.5, 50, 50);
     //path_embedding_Model.m_physical_Network.to_Screen();
 
     s_DirectedGraph *virtual_network;
@@ -1381,7 +1383,7 @@ sResult waxman_test_9_flat(void)
     virtual_network = &path_embedding_Model.m_virtual_Networks.back();
 
 //    virtual_network->generate_DirectedWaxman(40, 0.5, 0.5, 50, 50);    
-    virtual_network->generate_DirectedWaxman(20, 0.5, 0.5, 50, 50);
+    virtual_network->generate_DirectedWaxman(16,0.5, 0.5, 50, 50);
     virtual_network->to_Screen();
 
     /*
@@ -1429,6 +1431,7 @@ sResult waxman_test_9_flat(void)
     printf("Building FLAT model ... intermediate\n");    
 
     path_embedding_Model.build_LazyFlatModel(&encoder, solver, &geo_Circles);
+    printf("Number of Boolean variables: %d\n", encoder.m_last_variable_ID);
     printf("Building FLAT model ... finished\n");
 
     sEmbeddingModel::Mappings_vector vertex_Embeddings;
@@ -1437,7 +1440,7 @@ sResult waxman_test_9_flat(void)
     if (path_embedding_Model.solveAll_LazyFlatModel(&encoder, solver, vertex_Embeddings, path_Embeddings, &geo_Circles))
     {
 	path_embedding_Model.to_Screen_embedding(vertex_Embeddings, path_Embeddings);
-	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings, depth);
+	sDouble cost = path_embedding_Model.calc_EmbeddingCost(&encoder, solver, vertex_Embeddings, path_Embeddings);
 
 	printf("Cost: %.3f\n", cost);	
 	printf("Finally a correct embedding has been found !\n");		
@@ -1505,13 +1508,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }    
 */
-/*
+
     if (sFAILED(result = waxman_test_5_inc_geo_circ()))
     {
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }
-*/
+
 /*
     if (sFAILED(result = waxman_test_5_tree()))
     {
@@ -1553,7 +1556,7 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	printf("Test waxman 5 failed (error:%d).\n", result);
 	return result;
     }
-*/    
+*/  
 /*
     if (sFAILED(result = waxman_test_6()))
     {
@@ -1589,13 +1592,13 @@ int main(int sUNUSED(argc), const char **sUNUSED(argv))
 	return result;
     }                
 */
-
+/*
     if (sFAILED(result = waxman_test_9_flat()))
     {
 	printf("Test waxman 9 failed (error:%d).\n", result);
 	return result;
     }
-    
+*/  
     return sRESULT_SUCCESS;
 }
     
