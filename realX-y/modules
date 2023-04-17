@@ -7,8 +7,8 @@ types.cpp graph.cpp
 Core_realX
 library
 /src/core
-/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h robot.h cnf.h network.h
-robot.cpp cnf.cpp network.cpp
+/src/version.h /src/defs.h /src/config.h /src/compile.h /src/result.h robot.h cnf.h network.h top_K.h
+robot.cpp cnf.cpp network.cpp top_K.cpp
 
 Util_realX
 library

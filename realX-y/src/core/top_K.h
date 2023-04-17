@@ -9,32 +9,30 @@
 /*       http://users.fit.cvut.cz/surynek | <pavel.surynek@fit.cvut.cz>       */
 /*                                                                            */
 /*============================================================================*/
-/* basic_test.cpp / 0-124_nofutu                                              */
+/* top_K.h / 0-124_nofutu                                                     */
 /*----------------------------------------------------------------------------*/
 //
-// Basic initial test.
+// Top K path finding problem solvers.
 //
 /*----------------------------------------------------------------------------*/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <signal.h>
+#ifndef __TOP_K_H__
+#define __TOP_K_H__
+
+
+#include <vector>
 
 #include "defs.h"
-#include "compile.h"
-#include "result.h"
-#include "version.h"
 
 #include "common/types.h"
-#include "core/robot.h"
-#include "util/geometry.h"
+#include "common/graph.h"
 
-#include "test/basic_test.h"
+#include "core/cnf.h"
 
 
 using namespace std;
+
 using namespace realX;
 
 
@@ -44,59 +42,49 @@ namespace realX
 {
 
 
-
-
 /*----------------------------------------------------------------------------*/
-
-void print_Introduction(void)
-{
-    printf("----------------------------------------------------------------\n");    
-    printf("%s : Basic Test Program\n", sPRODUCT);
-    printf("%s\n", sCOPYRIGHT);
-    printf("================================================================\n");
-}
-
-
-int test_basic_1(void)
-{
-    printf("Testing basic 1 ...\n");
-    s2DRobot robot_1;
-    s2DRobot::Arm arm_1(2.0, 0.0);
-    arm_1.to_Screen();
-
-    s2D origin_1(0.0, 0.0);
-    s2D end_1;
-
-    robot_1.calc_EndPosition(arm_1, origin_1, end_1);
-    end_1.to_Screen();
     
-    printf("Testing basic 1 ... finished\n");
-    for (sInt_32 d = 0; d <= 180; d += 10)
+    class sTOP_K_PathModel
     {
-	arm_1.rotation = sDEG_2_RAD(d);
-	robot_1.calc_EndPosition(arm_1, origin_1, end_1);
-	end_1.to_Screen();
-    }
+    public:
+	typedef std::vector<s_DirectedGraph> DirectedGraphs_vector;
+	
+	typedef std::vector<sInt_32> Offsets_vector;
+	typedef std::vector<Offsets_vector> Offsets_2vector;
+	typedef std::vector<Offsets_2vector> Offsets_3vector;	
+	
+	typedef Offsets_vector PathOffsets_vector;
 
-    return sRESULT_SUCCESS;
-}
+    public:
+	Glucose::Solver* setup_SATSolver(sDouble timeout = -1.0);
+	void destroy_SATSolver(Glucose::Solver *solver);
+	
+	void setup_Basic_TopKModel(sBoolEncoder *encoder, sInt_32 path_length, sInt_32 K);
+	void build_Basic_TopKModel(sBoolEncoder *encoder, Glucose::Solver *solver);
+	
+	bool solve_TopKModel(Glucose::Solver *solver);
 
+    public:
+	sInt_32 calc_PathBitVariableID(sInt_32 path_id, sInt_32 step_id, sInt_32 v_id) const;
 
-}  // namespace realX
+    public:
+	virtual void to_Screen(const sString &indent = "") const;
+	virtual void to_Stream(FILE *fw, const sString &indent = "") const;
 
+	virtual void to_Screen_TopK(const sString &indent = "") const;
+
+    public:
+	sInt_32 m_path_length;
+	sInt_32 m_K;
+	
+	PathOffsets_vector m_path_Offsets;
+	
+	s_DirectedGraph m_Network;
+    };    
+  
 
 /*----------------------------------------------------------------------------*/
 
-int main(int sUNUSED(argc), const char **sUNUSED(argv))
-{
-    sResult result;
+} // namespace realX
 
-    print_Introduction();
-
-    if (sFAILED(result = test_basic_1()))
-    {
-	printf("Test basic 1 failed (error:%d).\n", result);
-	return result;
-    }
-    return 0;
-}
+#endif /* __TOP_K_H__ */
